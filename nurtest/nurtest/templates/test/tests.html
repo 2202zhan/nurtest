@@ -4,15 +4,27 @@
 {% block title %}Доступные тесты{% endblock %}
 
 {% block content %}
-
-<h2>Доступные тесты</h2>
-<ul>
-    {% for test in tests %}
-    <li>
-        <a href="{% url 'test_detail' test.id %}">{{ test.title }}</a>
-    </li>
-    {% empty %}
-    <p>Нет доступных тестов.</p>
-    {% endfor %}
-</ul>
-{% endblock %}  
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Доступные тесты</h2>
+    <div class="row">
+        {% for test in tests %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ test.title }}</h5>
+                    <p class="card-text text-muted">{{ test.description|default:"Описание отсутствует" }}</p>
+                    <p class="text-end text-secondary">
+                        <small>Категория: {{ test.category.name }}</small>
+                    </p>
+                    <a href="{% url 'test_detail' test.id %}" class="btn btn-primary mt-auto">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">Нет доступных тестов.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

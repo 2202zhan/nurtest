@@ -1,22 +1,48 @@
 {% extends 'shablons/main.html' %}
 
-{%block title%}Результаты теста{%endblock%}
+{% block title %}Результаты теста{% endblock %}
 
 {% block content %}
-<h2>Подробные результаты теста</h2>
-<p>Результат: {{ result.score }} из {{ result.test.question_set.count }} баллов</p>
-<h3>Ваши ответы</h3>
-<ul>
-    {% for answer in user_answers %}
-    <li>
-        Вопрос: {{ answer.question.text }} <br>
-        Ваш ответ: {{ answer.selected_answer.text }} <br>
-        {% if answer.selected_answer.is_correct %}
-        <span class="text-success">Правильный ответ</span>
-        {% else %}
-        <span class="text-danger">Неправильный ответ</span>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+<div class="container mt-5">
+    <h2 class="mb-4">Подробные результаты теста</h2>
+
+    <!-- Общий результат -->
+    <div class="alert alert-info">
+        <h4 class="alert-heading">Результат:</h4>
+        <p>
+            <strong>{{ result.score }}</strong> из <strong>{{ result.test.question_set.count }}</strong> баллов
+        </p>
+        <hr>
+        <p class="mb-0">Спасибо за участие в тесте!</p>
+    </div>
+
+    <!-- Подробные ответы -->
+    <h3 class="mt-5">Ваши ответы</h3>
+    <ul class="list-group">
+        {% for answer in user_answers %}
+        <li class="list-group-item">
+            <h5>Вопрос: {{ answer.question.text }}</h5>
+            <p>Ваш ответ: <strong>{{ answer.selected_answer.text }}</strong></p>
+            {% if answer.selected_answer.is_correct %}
+            <p class="text-success"><i class="bi bi-check-circle-fill"></i> Правильный ответ</p>
+            {% else %}
+            <p class="text-danger"><i class="bi bi-x-circle-fill"></i> Неправильный ответ</p>
+            <p>Правильный ответ:
+                {% for correct_answer in answer.question.answerchoice_set.all %}
+                {% if correct_answer.is_correct %}
+                <strong>{{ correct_answer.text }}</strong>
+                {% endif %}
+                {% endfor %}
+            </p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Кнопка возврата -->
+    <div class="mt-4">
+        <a href="{% url 'test_list' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i> Вернуться к списку
+            тестов</a>
+    </div>
+</div>
 {% endblock %}

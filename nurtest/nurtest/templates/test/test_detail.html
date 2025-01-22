@@ -1,36 +1,46 @@
-<!-- templates/tests_platform/test_detail.html -->
+<!-- templates/test/test_result.html -->
 {% extends 'shablons/main.html' %}
 
 {% block title %}{{ test.title }}{% endblock %}
 
 {% block content %}
-<h2>{{ test.title }}</h2>
-<form method="POST">
-    {% csrf_token %}
-    {% for question in questions %}
-    <fieldset>
-        <legend>{{ question.text }}</legend>
-        {% if question.question_type == 'single' %}
-        {% for answer in question.answerchoice_set.all %}
-        <div>
-            <input type="radio" id="question_{{ question.id }}_{{ answer.id }}" name="{{ question.id }}"
-                value="{{ answer.id }}">
-            <label for="question_{{ question.id }}_{{ answer.id }}">{{ answer.text }}</label>
-        </div>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">{{ test.title }}</h2>
+    <form method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {% for question in questions %}
+        <fieldset class="mb-4">
+            <legend class="h5">{{ question.text }}</legend>
+            <div class="mt-3">
+                {% if question.question_type == 'single' %}
+                {% for answer in question.answerchoice_set.all %}
+                <div class="form-check">
+                    <input type="radio" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
+                        name="{{ question.id }}" value="{{ answer.id }}" required>
+                    <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
+                        {{ answer.text }}
+                    </label>
+                </div>
+                {% endfor %}
+                {% elif question.question_type == 'multiple' %}
+                {% for answer in question.answerchoice_set.all %}
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
+                        name="{{ question.id }}" value="{{ answer.id }}">
+                    <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
+                        {{ answer.text }}
+                    </label>
+                </div>
+                {% endfor %}
+                {% elif question.question_type == 'text' %}
+                <textarea class="form-control mt-2" name="{{ question.id }}" rows="3" required></textarea>
+                {% endif %}
+            </div>
+        </fieldset>
         {% endfor %}
-        {% elif question.question_type == 'multiple' %}
-        {% for answer in question.answerchoice_set.all %}
-        <div>
-            <input type="checkbox" id="question_{{ question.id }}_{{ answer.id }}" name="{{ question.id }}"
-                value="{{ answer.id }}">
-            <label for="question_{{ question.id }}_{{ answer.id }}">{{ answer.text }}</label>
+        <div class="text-center">
+            <a href="{% url 'test_result' test.id %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i> Отправить ответы</a>
         </div>
-        {% endfor %}
-        {% elif question.question_type == 'text' %}
-        <textarea name="{{ question.id }}"></textarea>
-        {% endif %}
-    </fieldset>
-    {% endfor %}
-    <button type="submit">Отправить ответы</button>
-</form>
+    </form>
+</div>
 {% endblock %}

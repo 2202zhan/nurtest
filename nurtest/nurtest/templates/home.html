@@ -3,12 +3,50 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<body>
-    <header class="bg-light py-5 text-center">
-        <div class="container">
-            <h1 class="display-5 fw-bold">Добро пожаловать, {{ user.username }}</h1>
-            <p class="lead text-muted">Платформа для прохождения тестов и управления своими результатами.</p>
+<header class="bg-light py-5 text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold">Добро пожаловать, {{ user.username }}</h1>
+        <p class="lead text-muted">Платформа для прохождения тестов и управления своими результатами.</p>
+    </div>
+</header>
+
+<div class="container my-5">
+    <!-- Календарь активности -->
+    <section class="mb-5">
+        <h2 class="mb-3">Календарь активности</h2>
+        <div class="activity-calendar d-flex flex-wrap">
+            {% for week in activity_calendar %}
+            <div class="d-flex flex-column me-1">
+                {% for day in week %}
+                <div class="activity-day" style=`background-color: {{ day.color }}`
+                    title="Дата: {{ day.date }} | Тесты: {{ day.count }}"></div>
+                {% endfor %}
+            </div>
+            {% endfor %}
         </div>
-    </header>
-</body>
+        <p class="mt-3 text-muted">Подсветка: <span class="badge bg-success">Много</span>, <span
+                class="badge bg-warning">Средне</span>, <span class="badge bg-light">Мало</span></p>
+    </section>
+</div>
+
+<style>
+    .activity-calendar {
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .activity-day {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #ddd;
+        margin: 2px;
+        border-radius: 4px;
+    }
+
+    .activity-day:hover {
+        cursor: pointer;
+        opacity: 0.8;
+    }
+</style>
 {% endblock %}
