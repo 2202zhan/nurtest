@@ -1,0 +1,36 @@
+<!-- templates/tests_platform/test_detail.html -->
+{% extends 'shablons/main.html' %}
+
+{% block title %}{{ test.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ test.title }}</h2>
+<form method="POST">
+    {% csrf_token %}
+    {% for question in questions %}
+    <fieldset>
+        <legend>{{ question.text }}</legend>
+        {% if question.question_type == 'single' %}
+        {% for answer in question.answerchoice_set.all %}
+        <div>
+            <input type="radio" id="question_{{ question.id }}_{{ answer.id }}" name="{{ question.id }}"
+                value="{{ answer.id }}">
+            <label for="question_{{ question.id }}_{{ answer.id }}">{{ answer.text }}</label>
+        </div>
+        {% endfor %}
+        {% elif question.question_type == 'multiple' %}
+        {% for answer in question.answerchoice_set.all %}
+        <div>
+            <input type="checkbox" id="question_{{ question.id }}_{{ answer.id }}" name="{{ question.id }}"
+                value="{{ answer.id }}">
+            <label for="question_{{ question.id }}_{{ answer.id }}">{{ answer.text }}</label>
+        </div>
+        {% endfor %}
+        {% elif question.question_type == 'text' %}
+        <textarea name="{{ question.id }}"></textarea>
+        {% endif %}
+    </fieldset>
+    {% endfor %}
+    <button type="submit">Отправить ответы</button>
+</form>
+{% endblock %}

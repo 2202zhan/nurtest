@@ -49,3 +49,6 @@ def login_view(request):
 
 def home(request):
     return render(request, 'home.html')
+
+def settings(request):
+    return render(request, 'accounts/settings.html')

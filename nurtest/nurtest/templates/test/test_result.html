@@ -1,0 +1,10 @@
+<!-- templates/tests_platform/test_result.html -->
+{% extends 'shablons/main.html' %}
+
+{% block title %}Результаты теста{% endblock %}
+
+{% block content %}
+<h2>Результаты теста: {{ test.title }}</h2>
+<p>Ваш результат: {{ score }} из {{ test.question_set.count }} баллов.</p>
+<p><a href="{% url 'test_result' result.id %}">Посмотреть подробные результаты</a></p>
+{% endblock %}

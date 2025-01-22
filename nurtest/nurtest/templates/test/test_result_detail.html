@@ -1,0 +1,22 @@
+{% extends 'shablons/main.html' %}
+
+{%block title%}Результаты теста{%endblock%}
+
+{% block content %}
+<h2>Подробные результаты теста</h2>
+<p>Результат: {{ result.score }} из {{ result.test.question_set.count }} баллов</p>
+<h3>Ваши ответы</h3>
+<ul>
+    {% for answer in user_answers %}
+    <li>
+        Вопрос: {{ answer.question.text }} <br>
+        Ваш ответ: {{ answer.selected_answer.text }} <br>
+        {% if answer.selected_answer.is_correct %}
+        <span class="text-success">Правильный ответ</span>
+        {% else %}
+        <span class="text-danger">Неправильный ответ</span>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

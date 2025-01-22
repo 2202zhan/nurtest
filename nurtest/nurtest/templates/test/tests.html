@@ -1,0 +1,18 @@
+<!-- templates/tests_platform/tests.html -->
+{% extends 'shablons/main.html' %}
+
+{% block title %}Доступные тесты{% endblock %}
+
+{% block content %}
+
+<h2>Доступные тесты</h2>
+<ul>
+    {% for test in tests %}
+    <li>
+        <a href="{% url 'test_detail' test.id %}">{{ test.title }}</a>
+    </li>
+    {% empty %}
+    <p>Нет доступных тестов.</p>
+    {% endfor %}
+</ul>
+{% endblock %}  
