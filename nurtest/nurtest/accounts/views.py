@@ -79,6 +79,7 @@ def settings(request):
 
 
 @login_required
+@login_required
 def home(request):
     user = request.user
 
@@ -104,9 +105,6 @@ def home(request):
         'prev_month': {'year': year if month > 1 else year - 1, 'month': month - 1 if month > 1 else 12},
         'next_month': {'year': year if month < 12 else year + 1, 'month': month + 1 if month < 12 else 1},
     })
-
-
-
 
 def generate_month_activity_calendar(user, year, month):
     # Получение активности пользователя за указанный месяц
@@ -148,12 +146,7 @@ def generate_month_activity_calendar(user, year, month):
                 else:
                     color = "#f3f3f3"
 
-                week_data.append({'date': date, 'color': color, 'count': count})
+                week_data.append({'date': date, 'color': color})  # Убираем count
         calendar_data['weeks'].append(week_data)
 
     return calendar_data
-
-
-
-
-

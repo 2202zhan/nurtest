@@ -38,11 +38,8 @@
                     <tr>
                         {% for day in week %}
                         {% if day.date %}
-                        <td style=`background-color: {{ day.color }};`>
+                        <td style="background-color: {{ day.color }};">
                             <small>{{ day.date.day }}</small>
-                            {% if day.count > 0 %}
-                            <span class="badge bg-dark">{{ day.count }}</span>
-                            {% endif %}
                         </td>
                         {% else %}
                         <td></td>
@@ -54,13 +51,64 @@
             </table>
         </div>
     </div>
+
+    <!-- Информационный блок о цветах активности -->
+    <div class="mt-4 text-center">
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <span class="badge"
+                    style="background-color: #4CAF50; color: white; padding: 6px 15px; border-radius: 12px;">Зеленый</span>
+                <span>Много активности (более 5 раз в день)</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge"
+                    style="background-color: #FFC107; color: white; padding: 6px 15px; border-radius: 12px;">Желтый</span>
+                <span>Средняя активность (более 2 раз в день)</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge"
+                    style="background-color: #17A2B8; color: white; padding: 6px 15px; border-radius: 12px;">Светло-голубой</span>
+                <span>Низкая активность (более 0 раз в день)</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge"
+                    style="background-color: #6C757D; color: white; padding: 6px 15px; border-radius: 12px;">Серый</span>
+                <span>Нет активности</span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
     .activity-calendar table td {
-        height: 50px;
-        width: 50px;
+        height: 60px;
+        width: 60px;
         vertical-align: middle;
+        padding: 0;
+    }
+
+    .activity-calendar table td small {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .activity-calendar .badge {
+        font-size: 0.85rem;
+        padding: 6px 15px;
+        border-radius: 12px;
+    }
+
+    /* Уменьшение отступов между элементами */
+    .activity-calendar .row .col-auto {
+        font-size: 0.9rem;
+        margin-right: 20px;
+        text-align: center;
+    }
+
+    .activity-calendar .row .col-auto span {
+        display: block;
+        margin-top: 5px;
+        color: #555;
     }
 </style>
 

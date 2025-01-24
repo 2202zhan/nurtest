@@ -13,15 +13,15 @@ def process_answers(request, questions, test_result):
     score = 0
     total_points = 0  # Считаем общий балл за все вопросы
     for question in questions:
-        selected_answer = request.POST.getlist(str(question.id))  # Получаем все выбранные ответы
-        total_points += question.points  # Добавляем баллы для каждого вопроса
+        selected_answer = request.POST.get(str(question.id))
         if selected_answer:
             # Для одиночного ответа (radio)
             if question.question_type == 'single':
                 try:
-                    answer_choice = AnswerChoice.objects.get(id=selected_answer[0])
+                    answer_choice = AnswerChoice.objects.get(id=selected_answer)
                     if answer_choice.is_correct:
                         score += question.points
+                    total_points += question.points  # Максимум баллов за этот вопрос
                     UserAnswer.objects.create(
                         question=question,
                         selected_answer=answer_choice,
@@ -32,11 +32,15 @@ def process_answers(request, questions, test_result):
 
             # Для множественного ответа (checkbox)
             elif question.question_type == 'multiple':
-                for answer_id in selected_answer:
+                selected_answers = request.POST.getlist(str(question.id))
+                correct_answers = question.answerchoice_set.filter(is_correct=True)
+                correct_count = correct_answers.count()
+                selected_correct_count = 0
+                for answer_id in selected_answers:
                     try:
                         answer_choice = AnswerChoice.objects.get(id=answer_id)
                         if answer_choice.is_correct:
-                            score += question.points
+                            selected_correct_count += 1
                         UserAnswer.objects.create(
                             question=question,
                             selected_answer=answer_choice,
@@ -45,16 +49,29 @@ def process_answers(request, questions, test_result):
                     except AnswerChoice.DoesNotExist:
                         continue
 
+                # Рассчитываем баллы для многократных вопросов
+                if selected_correct_count == correct_count:
+                    score += question.points  # Все правильные ответы выбраны
+                else:
+                    # Если выбраны только некоторые правильные ответы, начисляем баллы пропорционально
+                    score += question.points * (selected_correct_count / correct_count)
+
+                total_points += question.points  # Максимум баллов за этот вопрос
+
             # Обработка текстового ответа
             elif question.question_type == 'text':
-                text_answer = selected_answer[0].strip()
+                text_answer = selected_answer.strip()
                 UserAnswer.objects.create(
                     question=question,
                     text_answer=text_answer,
                     test_result=test_result
                 )
+                total_points += question.points  # Максимум баллов за текстовый вопрос
+        else:
+            # Если нет ответа, то не начисляется балл
+            total_points += question.points  # Максимум баллов за этот вопрос (за невыполненный)
+    
     return score, total_points
-
 
 # Страница прохождения теста
 @login_required
@@ -69,6 +86,8 @@ def test_detail(request, test_id):
         test_result.save()
 
         # Вычисление процента правильных ответов
+        total_questions = test.question_set.count()
+        # Если у нас есть хотя бы один вопрос, вычисляем процент
         percentage = (score / total_points) * 100 if total_points > 0 else 0
 
         return render(request, 'test/test_result.html', {
@@ -86,8 +105,9 @@ def test_result(request, result_id):
     result = get_object_or_404(TestResult, id=result_id)
     test = result.test
     score = result.score
+    total_questions = test.question_set.count()
 
-    # Получаем общее количество баллов за все вопросы
+    # Получаем количество правильных ответов и общий балл для теста
     total_points = test.question_set.aggregate(total_points=models.Sum('points'))['total_points'] or 0
 
     # Вычисляем процент правильных ответов
