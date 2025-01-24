@@ -1,35 +1,38 @@
-<!-- templates/test/test_result.html -->
 {% extends 'shablons/main.html' %}
 
 {% block title %}Результаты теста{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Результаты теста: {{ test.title }}</h2>
+    <h2 class="text-center mb-4">{{ test.title }}</h2>
 
+    <!-- Ваш результат -->
     <div class="alert alert-info" role="alert">
         Ваш результат: <strong>{{ score }}</strong> из <strong>{{ test.question_set.count }}</strong> баллов.
     </div>
 
-<div class="progress mb-4" style="height: 30px;">
-    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style=`width: {{ percentage }}%;`
-        aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100">
-        {{ percentage|floatformat:2 }}%
+    <!-- Прогресс-бар -->
+    <div class="progress mb-4" style="height: 30px;">
+        <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{ percentage }}%;"
+            aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100">
+            {{ percentage|floatformat:2 }}%
+        </div>
     </div>
-</div>
 
-<div class="d-flex justify-content-center align-items-center"
-    style="height: 200px; width: 200px; margin: 0 auto; position: relative;">
-    <svg class="progress-circle" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"
-        style="transform: rotate(-90deg);">
-        <circle class="circle-bg" cx="18" cy="18" r="15.9155" fill="none" stroke="#f3f3f3" stroke-width="4"></circle>
-        <circle class="circle-progress" cx="18" cy="18" r="15.9155" fill="none" stroke="#4caf50" stroke-width="4"
-            stroke-dasharray="{{ percentage }}, 100" stroke-dashoffset="0"></circle>
-    </svg>
-    <div class="circle-text position-absolute text-center">
-        <span class="fs-3 fw-bold">{{ percentage|floatformat:2 }}%</span>
+    <!-- SVG круговой прогресс-бар -->
+    <div class="d-flex justify-content-center align-items-center"
+        style="height: 200px; width: 200px; margin: 0 auto; position: relative;">
+        <svg class="progress-circle" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"
+            style="transform: rotate(-90deg);">
+            <circle class="circle-bg" cx="18" cy="18" r="15.9155" fill="none" stroke="#f3f3f3" stroke-width="4">
+            </circle>
+            <circle class="circle-progress" cx="18" cy="18" r="15.9155" fill="none" stroke="#4caf50" stroke-width="4"
+                stroke-dasharray="{{ percentage }}, 100" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="circle-text position-absolute text-center">
+            <span class="fs-3 fw-bold">{{ percentage|floatformat:2 }}%</span>
+        </div>
     </div>
-</div>
 
     <div class="mt-4">
         <a href="{% url 'test_result_detail' result.id %}" class="btn btn-primary">Подробнее узнать ответы</a>

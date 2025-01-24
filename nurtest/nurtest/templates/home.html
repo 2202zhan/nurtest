@@ -3,50 +3,65 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<header class="bg-light py-5 text-center">
-    <div class="container">
+<div class="container mt-5">
+    <header class="bg-light py-5 text-center">
         <h1 class="display-5 fw-bold">Добро пожаловать, {{ user.username }}</h1>
         <p class="lead text-muted">Платформа для прохождения тестов и управления своими результатами.</p>
-    </div>
-</header>
+    </header>
 
-<div class="container my-5">
     <!-- Календарь активности -->
-    <section class="mb-5">
-        <h2 class="mb-3">Календарь активности</h2>
-        <div class="activity-calendar d-flex flex-wrap">
-            {% for week in activity_calendar %}
-            <div class="d-flex flex-column me-1">
-                {% for day in week %}
-                <div class="activity-day" style=`background-color: {{ day.color }}`
-                    title="Дата: {{ day.date }} | Тесты: {{ day.count }}"></div>
-                {% endfor %}
-            </div>
-            {% endfor %}
+    <h3 class="text-center mt-5">Календарь активности</h3>
+
+    <!-- Навигация между месяцами -->
+    <div class="d-flex justify-content-between my-4">
+        <a class="btn btn-outline-primary" href="?year={{ prev_month.year }}&month={{ prev_month.month }}">Назад</a>
+        <h4>{{ activity_calendar.month }}/{{ activity_calendar.year }}</h4>
+        <a class="btn btn-outline-primary" href="?year={{ next_month.year }}&month={{ next_month.month }}">Вперед</a>
+    </div>
+
+    <div class="activity-calendar">
+        <div class="table-responsive">
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>Пн</th>
+                        <th>Вт</th>
+                        <th>Ср</th>
+                        <th>Чт</th>
+                        <th>Пт</th>
+                        <th>Сб</th>
+                        <th>Вс</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in activity_calendar.weeks %}
+                    <tr>
+                        {% for day in week %}
+                        {% if day.date %}
+                        <td style=`background-color: {{ day.color }};`>
+                            <small>{{ day.date.day }}</small>
+                            {% if day.count > 0 %}
+                            <span class="badge bg-dark">{{ day.count }}</span>
+                            {% endif %}
+                        </td>
+                        {% else %}
+                        <td></td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <p class="mt-3 text-muted">Подсветка: <span class="badge bg-success">Много</span>, <span
-                class="badge bg-warning">Средне</span>, <span class="badge bg-light">Мало</span></p>
-    </section>
+    </div>
 </div>
 
 <style>
-    .activity-calendar {
-        width: 100%;
-        max-width: 700px;
-        margin: 0 auto;
-    }
-
-    .activity-day {
-        width: 20px;
-        height: 20px;
-        border: 1px solid #ddd;
-        margin: 2px;
-        border-radius: 4px;
-    }
-
-    .activity-day:hover {
-        cursor: pointer;
-        opacity: 0.8;
+    .activity-calendar table td {
+        height: 50px;
+        width: 50px;
+        vertical-align: middle;
     }
 </style>
+
 {% endblock %}

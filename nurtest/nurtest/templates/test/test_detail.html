@@ -1,4 +1,3 @@
-<!-- templates/test/test_result.html -->
 {% extends 'shablons/main.html' %}
 
 {% block title %}{{ test.title }}{% endblock %}
@@ -39,8 +38,16 @@
         </fieldset>
         {% endfor %}
         <div class="text-center">
-            <a href="{% url 'test_result' test.id %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i> Отправить ответы</a>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right"></i> Отправить ответы</button>
         </div>
     </form>
 </div>
+
+{% if score is not none %}
+<div class="mt-4 text-center">
+    <h3>Ваши результаты:</h3>
+    <p>Правильные ответы: {{ score }} / {{ questions|length }}</p>
+    <p>Процент правильных ответов: {{ percentage }}%</p>
+</div>
+{% endif %}
 {% endblock %}

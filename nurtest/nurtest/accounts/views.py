@@ -8,9 +8,18 @@ from django.contrib.auth.views import LogoutView
 
 from datetime import datetime, timedelta
 from collections import defaultdict
+import calendar
 from tests_platform.models import TestResult
 
 from django.contrib.auth.decorators import login_required
+
+
+
+
+from django.shortcuts import render
+from datetime import datetime
+
+
 
 
 def register(request):
@@ -72,57 +81,79 @@ def settings(request):
 @login_required
 def home(request):
     user = request.user
-    activity_calendar = generate_activity_calendar(user)
-    
+
+    # Получение года и месяца из GET-запроса
+    year = request.GET.get('year', datetime.now().year)
+    month = request.GET.get('month', datetime.now().month)
+    year = int(year)
+    month = int(month)
+
+    # Ограничение на переход
+    if month < 1:
+        month = 12
+        year -= 1
+    elif month > 12:
+        month = 1
+        year += 1
+
+    # Генерация данных для текущего месяца
+    activity_calendar = generate_month_activity_calendar(user, year, month)
+
     return render(request, 'home.html', {
         'activity_calendar': activity_calendar,
+        'prev_month': {'year': year if month > 1 else year - 1, 'month': month - 1 if month > 1 else 12},
+        'next_month': {'year': year if month < 12 else year + 1, 'month': month + 1 if month < 12 else 1},
     })
 
 
 
-def generate_activity_calendar(user):
-    """Генерирует данные для календаря активности"""
-    today = datetime.today()
-    start_date = today - timedelta(days=365)  # Последний год
-    activity_data = defaultdict(int)
 
-    # Считаем тесты за год
-    results = TestResult.objects.filter(user=user, completed_at__gte=start_date)
+def generate_month_activity_calendar(user, year, month):
+    # Получение активности пользователя за указанный месяц
+    start_date = datetime(year, month, 1)
+    _, days_in_month = calendar.monthrange(year, month)
+    end_date = start_date + timedelta(days=days_in_month - 1)
+
+    # Собираем активности за месяц
+    activity_data = defaultdict(int)
+    results = TestResult.objects.filter(user=user, completed_at__range=[start_date, end_date])
     for result in results:
         date = result.completed_at.date()
         activity_data[date] += 1
 
-    # Генерация данных для календаря
-    calendar = []
-    current_week = []
-    day = start_date
+    # Формируем данные по неделям
+    calendar_data = {
+        'month': month,
+        'year': year,
+        'weeks': []
+    }
 
-    while day <= today:
-        count = activity_data.get(day, 0)
-        # Определяем цвет активности
-        if count > 5:
-            color = "green"
-        elif count > 2:
-            color = "yellow"
-        elif count > 0:
-            color = "lightblue"
-        else:
-            color = "#f3f3f3"  # Белый цвет для бездействующих дней
+    month_days = calendar.Calendar().monthdayscalendar(year, month)
+    for week in month_days:
+        week_data = []
+        for day in week:
+            if day == 0:  # Пустые ячейки
+                week_data.append({'date': None, 'color': '#f3f3f3'})
+            else:
+                date = datetime(year, month, day).date()
+                count = activity_data.get(date, 0)
 
-        current_week.append({'date': day.strftime('%Y-%m-%d'), 'count': count, 'color': color})
+                # Определение цвета ячеек
+                if count > 5:
+                    color = "green"
+                elif count > 2:
+                    color = "yellow"
+                elif count > 0:
+                    color = "lightblue"
+                else:
+                    color = "#f3f3f3"
 
-        # Если конец недели (воскресенье), добавляем текущую неделю в календарь
-        if day.weekday() == 6:  
-            calendar.append(current_week)
-            current_week = []
-        
-        day += timedelta(days=1)
+                week_data.append({'date': date, 'color': color, 'count': count})
+        calendar_data['weeks'].append(week_data)
 
-    # Добавление оставшихся дней в последнюю неделю, если она неполная
-    if current_week:  
-        calendar.append(current_week)
+    return calendar_data
 
-    return calendar
+
 
 
 
