@@ -1,7 +1,10 @@
 from django.urls import path
-from .views import register, login_view, home, settings
+from .views import register, login_view, home, settings, chatgpt
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth import views as auth_views
+
+from django.urls import path
+from . import views
 
 urlpatterns = [
     path('register/', register, name='register'),
@@ -14,6 +17,8 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     #path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
     path('settings/', settings, name='settings'),
+    path('chatgpt/', chatgpt, name='chatgpt'),
+   
 
 ]
 

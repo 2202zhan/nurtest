@@ -13,14 +13,15 @@ from tests_platform.models import TestResult
 
 from django.contrib.auth.decorators import login_required
 
-
-
-
 from django.shortcuts import render
 from datetime import datetime
 
 
 
+import g4f
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def register(request):
     if request.method == 'POST':
@@ -78,7 +79,7 @@ def settings(request):
 
 
 
-@login_required
+
 @login_required
 def home(request):
     user = request.user
@@ -99,6 +100,8 @@ def home(request):
 
     # Генерация данных для текущего месяца
     activity_calendar = generate_month_activity_calendar(user, year, month)
+
+
 
     return render(request, 'home.html', {
         'activity_calendar': activity_calendar,
@@ -150,3 +153,46 @@ def generate_month_activity_calendar(user, year, month):
         calendar_data['weeks'].append(week_data)
 
     return calendar_data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@csrf_exempt
+def chatgpt(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user_message = data.get("message", "")
+
+            if not user_message.strip():
+                return JsonResponse({"error": "Сообщение пустое"}, status=400)
+
+            # Используем g4f для получения ответа
+            response = g4f.ChatCompletion.create(
+                model="gpt-4",  # или другая доступная модель
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": user_message},
+                ]
+            )
+
+            if response:
+                return JsonResponse({"reply": response}, status=200)
+            else:
+                return JsonResponse({"error": "Нет ответа от модели"}, status=500)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Метод запроса не поддерживается"}, status=405)
