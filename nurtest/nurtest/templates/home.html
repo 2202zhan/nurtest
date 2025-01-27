@@ -14,6 +14,8 @@
         <h1 class="fw-bold">Добро пожаловать, Гость!</h1>
         <p class="text-muted">Пожалуйста, войдите в систему, чтобы увидеть свою активность и использовать платформу.</p>
         {% endif %}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     </header>
 
     {% if user.is_authenticated %}
@@ -84,38 +86,40 @@
         </div>
     </section>
 
-    <!-- Чат с AI -->
-    <section class="mt-5">
-        <h5 class="text-center">Чат с AI</h5>
+<!-- Чат с AI -->
+<section class="mt-5">
+    <!-- Кнопка открытия чата -->
+    <div id="chat-button-container" class="position-fixed" style="right: 10px; bottom: 10px; z-index: 1050;">
+        <button id="open-chat"
+            class="btn btn-outline-success rounded-circle p-3 d-flex align-items-center justify-content-center"
+            style="width: 60px; height: 60px;">
+            <i class="bi bi-chat-dots" style="font-size: 24px;"></i>
+        </button>
+    </div>
 
-        <!-- Кнопка открытия чата -->
-        <div class="d-flex justify-content-center mb-3">
-            <button id="open-chat" class="btn btn-outline-success">Открыть чат</button>
-        </div>
-
-        <!-- Модальное окно чата -->
-        <div class="modal fade" id="chat-modal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="chatModalLabel">ChatGPT</h5>
-                        <button type="button" id="close-chat" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Закрыть"></button>
+    <!-- Модальное окно чата -->
+    <div class="modal fade" id="chat-modal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chatModalLabel">ChatGPT</h5>
+                    <button type="button" id="close-chat" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="chat-window" class="mb-3" style="max-height: 300px; overflow-y: scroll;">
+                        <!-- Сообщения будут здесь -->
                     </div>
-                    <div class="modal-body">
-                        <div id="chat-window" class="mb-3" style="max-height: 300px; overflow-y: scroll;">
-                            <!-- Сообщения будут здесь -->
-                        </div>
-                        <div class="input-group">
-                            <input type="text" id="user-input" class="form-control"
-                                placeholder="Введите ваше сообщение..." />
-                            <button id="send-message" class="btn btn-primary">Отправить</button>
-                        </div>
+                    <div class="input-group">
+                        <input type="text" id="user-input" class="form-control"
+                            placeholder="Введите ваше сообщение..." />
+                        <button id="send-message" class="btn btn-primary">Отправить</button>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
     
 {% else %}
 <!-- Для гостей -->
@@ -207,4 +211,35 @@
 </style>
 
 <script src="{% static 'chat.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chatButton = document.getElementById("chat-button-container");
+
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        chatButton.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            offsetX = e.clientX - chatButton.offsetLeft;
+            offsetY = e.clientY - chatButton.offsetTop;
+            chatButton.style.cursor = "move";
+        });
+
+        document.addEventListener("mousemove", (e) => {
+            if (!isDragging) return;
+
+            const left = e.clientX - offsetX;
+            const top = e.clientY - offsetY;
+
+            chatButton.style.left = `${left}px`;
+            chatButton.style.top = `${top}px`;
+        });
+
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+            chatButton.style.cursor = "pointer";
+        });
+    });
+</script>
 {% endblock %}
