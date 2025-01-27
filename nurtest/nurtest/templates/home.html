@@ -116,15 +116,50 @@
             </div>
         </div>
     </section>
-    {% else %}
-    <!-- Для гостей -->
-    <section class="guest-info mt-5">
-        <p class="text-center text-muted">
-            Чтобы увидеть вашу активность и использовать все возможности платформы, пожалуйста,
-            <a href="{% url 'login_view' %}">войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь</a>.
-        </p>
-    </section>
-    {% endif %}
+    
+{% else %}
+<!-- Для гостей -->
+<section class="guest-info mt-5 d-flex flex-column align-items-center">
+    <!-- Карусель фотографий -->
+    <div id="welcomeCarousel" class="carousel slide mb-4" data-bs-ride="carousel" style="max-width: 500px;">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'images/welcome1.jpg' %}" class="d-block w-100" alt="Welcome 1">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/welcome2.jpg' %}" class="d-block w-100" alt="Welcome 2">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/welcome3.jpg' %}" class="d-block w-100" alt="Welcome 3">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#welcomeCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#welcomeCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'login_view' %}" class="btn btn-primary btn-lg">
+            Войти
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">
+            Зарегистрироваться
+        </a>
+    </div>
+    <!-- Фоновая музыка -->
+    <audio autoplay loop>
+        <source src="{% static 'audio/background.mp3' %}" type="audio/mpeg">
+        Ваш браузер не поддерживает воспроизведение аудио.
+    </audio>
+</section>
+{% endif %}
+
 
     <!-- Свободное место -->
     <div class="spacer" style="height: 50px;"></div>
