@@ -7,10 +7,16 @@
 <div class="container mt-5">
     <!-- Заголовок -->
     <header class="text-center py-4">
+        {% if user.is_authenticated %}
         <h1 class="fw-bold">Добро пожаловать, {{ user.username }}</h1>
         <p class="text-muted">Платформа для прохождения тестов и отслеживания своей активности.</p>
+        {% else %}
+        <h1 class="fw-bold">Добро пожаловать, Гость!</h1>
+        <p class="text-muted">Пожалуйста, войдите в систему, чтобы увидеть свою активность и использовать платформу.</p>
+        {% endif %}
     </header>
 
+    {% if user.is_authenticated %}
     <!-- Календарь активности -->
     <section class="calendar-section">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -110,13 +116,22 @@
             </div>
         </div>
     </section>
+    {% else %}
+    <!-- Для гостей -->
+    <section class="guest-info mt-5">
+        <p class="text-center text-muted">
+            Чтобы увидеть вашу активность и использовать все возможности платформы, пожалуйста,
+            <a href="{% url 'login_view' %}">войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь</a>.
+        </p>
+    </section>
+    {% endif %}
 
     <!-- Свободное место -->
     <div class="spacer" style="height: 50px;"></div>
 </div>
 
+<!-- Стили и скрипты остаются без изменений -->
 <style>
-    /* Календарь */
     .day-cell {
         height: 70px;
         width: 70px;
@@ -135,7 +150,6 @@
         background-color: #fff;
     }
 
-    /* Легенда */
     .legend {
         font-size: 0.9rem;
     }
@@ -152,7 +166,6 @@
         border-radius: 4px;
     }
 
-    /* Свободное место */
     .spacer {
         height: 50px;
     }

@@ -27,14 +27,23 @@ function displayMessage(message, sender) {
 
     const messageBubble = document.createElement("div");
     messageBubble.classList.add("badge", sender === "user" ? "bg-light" : "bg-info");
-    messageBubble.classList.add("p-2", "text-dark")
+    messageBubble.classList.add("p-2", "text-dark");
+
+    // Ограничиваем ширину сообщения
+    const modalWidth = document.getElementById("chat-modal").offsetWidth; // Получаем ширину модального окна
+    messageBubble.style.maxWidth = `${modalWidth - 40}px`; // Учитываем внутренние отступы
+    messageBubble.style.wordWrap = "break-word"; // Перенос слов
+    messageBubble.style.whiteSpace = "pre-wrap"; // Сохраняем переносы строк
     messageBubble.textContent = message;
 
     messageElement.appendChild(messageBubble);
     document.getElementById("chat-window").appendChild(messageElement);
 
-    document.getElementById("chat-window").scrollTop = document.getElementById("chat-window").scrollHeight;
+    // Прокрутка вниз для отображения последнего сообщения
+    const chatWindow = document.getElementById("chat-window");
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 }
+
 
 async function getChatGPTResponse(userInput) {
     const response = await fetch("http://127.0.0.1:8000/accounts/chatgpt/", { // API URL

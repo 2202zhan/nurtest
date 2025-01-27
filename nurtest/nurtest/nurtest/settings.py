@@ -91,6 +91,10 @@ DATABASES = {
 }
 
 
+LOGIN_URL = 'http://127.0.0.1:8000/accounts/login/'  # Укажите путь к странице входа
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

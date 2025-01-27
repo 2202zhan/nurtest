@@ -3,12 +3,12 @@ from .models import Test, TestResult, AnswerChoice, UserAnswer
 from django.contrib.auth.decorators import login_required
 
 # Отображение списка доступных тестов
-@login_required
 def test_list(request):
     tests = Test.objects.filter(is_active=True)
     return render(request, 'test/tests.html', {'tests': tests})
 
 # Обработка ответов на вопросы
+@login_required
 def process_answers(request, questions, test_result):
     score = 0
     total_points = 0  # Считаем общий балл за все вопросы
