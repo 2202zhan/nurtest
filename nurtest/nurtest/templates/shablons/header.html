@@ -22,7 +22,12 @@
                             href="{% url 'settings' %}">Настройки</a>
                     </li>
                 </ul>
-                <a href="{% url 'logout' %}" class="btn btn-outline-danger">Выйти</a>
+                    {% if user.is_authenticated %}
+                    <!-- Кнопка "Выйти" -->
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Выйти</a>
+                    {% endif %}
+
+                <!-- <a href="{% url 'logout' %}" class="btn btn-outline-danger">Выйти</a> -->
             </div>
         </div>
     </nav>
