@@ -15,7 +15,7 @@ class CustomUserAdmin(UserAdmin):
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important Dates', {'fields': ('last_login', 'date_joined')}),
     )
-    # Поля, которые отображаются при создании нового пользователя
+    # Поля, которые отображаются при создании нового пользователя 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),

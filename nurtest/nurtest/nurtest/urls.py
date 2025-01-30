@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('tests/', include('tests_platform.urls')),
+    path('custom-admin/', include('custom_admin.urls')),  # Кастомная админ-панель
 ]

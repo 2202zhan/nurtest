@@ -1,0 +1,38 @@
+{% extends 'shablons/main.html' %}
+
+{% block title %}Главная{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Топранг - Рейтинг пользователей</h3>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Рейтинг</h5>
+            <p class="card-text">Здесь отображаются пользователи с наибольшим количеством баллов.</p>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Пользователь</th>
+                        <th>Баллы</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_rating in ratings %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user_rating.username }}</td>
+                        <td>{{ user_rating.score }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">Нет данных для отображения.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

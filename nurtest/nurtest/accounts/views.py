@@ -163,3 +163,18 @@ def chatgpt(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Метод запроса не поддерживается"}, status=405)
+
+def toprank_view(request):
+    # Пример фиктивных данных для рейтинга
+    ratings = [
+        {"username": "User1", "score": 150},
+        {"username": "User2", "score": 130},
+        {"username": "User3", "score": 120},
+        {"username": "User4", "score": 100},
+        {"username": "User5", "score": 80},
+    ]
+
+    # Сортируем список пользователей по убыванию баллов
+    ratings.sort(key=lambda x: x['score'], reverse=True)
+
+    return render(request, 'toprank.html', {'ratings': ratings})

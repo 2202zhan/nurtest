@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     
     'accounts',
     'tests_platform',
+    'custom_admin',
     'bootstrap5',
     
 ]
