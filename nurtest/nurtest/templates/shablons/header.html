@@ -21,22 +21,31 @@
                         <a class="nav-link {% if request.path == '/settings/' %}active{% endif %}"
                             href="{% url 'settings' %}">Настройки</a>
                     </li>
-                                        <!-- Кнопка Топранг -->
+                    <!-- Кнопка Топранг -->
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/toprank/' %}active{% endif %}" href="{% url 'toprank' %}">
+                        <a class="nav-link {% if request.path == '/toprank/' %}active{% endif %}"
+                            href="{% url 'toprank' %}">
                             Топранг
                         </a>
                     </li>
                     {% endif %}
-                </ul>
-                </ul>
-                    {% if user.is_authenticated %}
-                    <!-- Кнопка "Выйти" -->
-                    <a href="{% url 'logout' %}" class="btn btn-danger">Выйти</a>
-                    {% endif %}
 
-                <!-- <a href="{% url 'logout' %}" class="btn btn-outline-danger">Выйти</a> -->
+                    <!-- Кнопка Админ-панели -->
+                    {% if user.is_authenticated and user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path|slice:'0:13' == '/custom-admin/' %}active{% endif %}"
+                            href="{% url 'test-list' %}" style="color: #fcfcfc8b; font-weight: bold;">
+                            Админ-панель
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                {% if user.is_authenticated %}
+                <!-- Кнопка "Выйти" -->
+                <a href="{% url 'logout' %}" class="btn btn-danger">Выйти</a>
+                {% endif %}
             </div>
         </div>
     </nav>
