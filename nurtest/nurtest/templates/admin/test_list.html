@@ -1,30 +1,93 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Список тестов</h1>
-<a href="{% url 'test-add' %}" class="btn btn-primary mb-3">Добавить тест</a>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Название</th>
-            <th>Категория</th>
-            <th>Автор</th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-6 fw-light mb-0">Управление тестами</h1>
+        <a href="{% url 'test-add' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-plus-lg me-2"></i>Новый тест
+        </a>
+    </div>
+
+    <div class="row g-4">
         {% for test in tests %}
-        <tr>
-            <td>{{ test.title }}</td>
-            <td>{{ test.category.name }}</td>
-            <td>{{ test.author.username }}</td>
-            <td>
-                <a href="{% url 'test-edit' test.pk %}" class="btn btn-sm btn-warning">Редактировать</a>
-                <a href="{% url 'test-delete' test.pk %}" class="btn btn-sm btn-danger">Удалить</a>
-                <a href="{% url 'question-list' test.pk %}" class="btn btn-sm btn-info">Вопросы</a>
-            </td>
-        </tr>
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card shadow-sm hover-elevate border-0">
+                <div class="card-body">
+                    <!-- Заголовок и категория -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-grow-1">
+                            <h3 class="card-title fw-semibold text-dark">{{ test.title }}</h3>
+                            <span class="badge bg-primary bg-opacity-10 text-primary">
+                                {{ test.category.name }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Автор и дата -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="avatar avatar-sm bg-primary bg-opacity-10 text-primary rounded-circle me-2">
+                            {{ test.author.username|first|upper }}
+                        </div>
+                        <div>
+                            <div class="text-muted small">Автор</div>
+                            <div class="fw-medium">{{ test.author.username }}</div>
+                        </div>
+                        <div class="ms-auto text-end">
+                            <div class="text-muted small">Создан</div>
+                            <div class="fw-medium">{{ test.created_at|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки управления -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'test-edit' test.pk %}" class="btn btn-icon btn-sm btn-light rounded-circle"
+                            data-bs-toggle="tooltip" title="Редактировать">
+                            <i class="bi bi-pencil-fill text-primary"></i>
+                        </a>
+
+                        <a href="{% url 'question-list' test.pk %}" class="btn btn-icon btn-sm btn-light rounded-circle"
+                            data-bs-toggle="tooltip" title="Вопросы">
+                            <i class="bi bi-list-ol text-info"></i>
+                        </a>
+
+                        <a href="{% url 'test-delete' test.pk %}" class="btn btn-icon btn-sm btn-light rounded-circle"
+                            data-bs-toggle="tooltip" title="Удалить">
+                            <i class="bi bi-trash3-fill text-danger"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </tbody>
-</table>
+    </div>
+</div>
+
+<style>
+    .hover-elevate {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hover-elevate:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 {% endblock %}

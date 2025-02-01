@@ -1,30 +1,127 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Вопросы для теста: {{ test.title }}</h1>
-<a href="{% url 'question-add' test.pk %}" class="btn btn-primary mb-3">Добавить вопрос</a>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Текст вопроса</th>
-            <th>Тип вопроса</th>
-            <th>Баллы</th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for question in questions %}
-        <tr>
-            <td>{{ question.text }}</td>
-            <td>{{ question.get_question_type_display }}</td>
-            <td>{{ question.points }}</td>
-            <td>
-                <a href="{% url 'question-edit' question.pk %}" class="btn btn-sm btn-warning">Редактировать</a>
-                <a href="{% url 'question-delete' question.pk %}" class="btn btn-sm btn-danger">Удалить</a>
-                <a href="{% url 'answerchoice-list' question.pk %}" class="btn btn-sm btn-info">Ответы</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-6 fw-light mb-0">Вопросы для теста: {{ test.title }}</h1>
+        <a href="{% url 'question-add' test.pk %}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-plus-lg me-2"></i>Добавить вопрос
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="fw-medium">Текст вопроса</th>
+                            <th scope="col" class="fw-medium">Тип вопроса</th>
+                            <th scope="col" class="fw-medium">Баллы</th>
+                            <th scope="col" class="fw-medium text-end">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question in questions %}
+                        <tr>
+                            <td>{{ question.text }}</td>
+                            <td>
+                                <span class="badge bg-soft-primary">
+                                    {{ question.get_question_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-soft-success">
+                                    {{ question.points }} баллов
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'question-edit' question.pk %}"
+                                        class="btn btn-icon btn-sm btn-soft-warning rounded-circle"
+                                        data-bs-toggle="tooltip" title="Редактировать">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+
+                                    <a href="{% url 'question-delete' question.pk %}"
+                                        class="btn btn-icon btn-sm btn-soft-danger rounded-circle"
+                                        data-bs-toggle="tooltip" title="Удалить">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </a>
+
+                                    <a href="{% url 'answerchoice-list' question.pk %}"
+                                        class="btn btn-icon btn-sm btn-soft-info rounded-circle"
+                                        data-bs-toggle="tooltip" title="Ответы">
+                                        <i class="bi bi-list-ol"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 1.25rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        font-weight: 500;
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    .table td,
+    .table th {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.75rem;
+    }
+
+    .bg-soft-primary {
+        background-color: rgba(74, 144, 226, 0.1);
+        color: #4A90E2;
+    }
+
+    .bg-soft-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-soft-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .btn-soft-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    .btn-soft-info {
+        background-color: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+    }
+</style>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from tests_platform.models import Test, Question, AnswerChoice
@@ -51,7 +51,9 @@ class QuestionCreateView(PermissionRequiredMixin, CreateView):
     template_name = 'admin/question_form.html'
     fields = ['test', 'text', 'question_type', 'points']
     permission_required = 'tests.add_question'
-    success_url = reverse_lazy('test-list')
+
+    def get_success_url(self):
+        return reverse('question-list', kwargs={'test_id': self.object.test.pk})
 
 class QuestionUpdateView(PermissionRequiredMixin, UpdateView):
     model = Question
