@@ -21,15 +21,12 @@
                         <a class="nav-link {% if request.path == '/settings/' %}active{% endif %}"
                             href="{% url 'settings' %}">Настройки</a>
                     </li>
-                    <!-- Кнопка Топранг -->
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/toprank/' %}active{% endif %}"
-                            href="{% url 'toprank' %}">
-                            Топранг
-                        </a>
-                    </li>
-                    {% endif %}
+                <!-- Кнопка Топранг -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/toprank/' %}active{% endif %}" href="{% url 'toprank' %}">
+                        Топранг
+                    </a>
+                </li>
 
                     <!-- Кнопка Админ-панели -->
                     {% if user.is_authenticated and user.is_staff %}

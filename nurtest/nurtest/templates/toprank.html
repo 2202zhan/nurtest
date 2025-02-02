@@ -1,38 +1,80 @@
 {% extends 'shablons/main.html' %}
 
-{% block title %}Главная{% endblock %}
-{% load static %}
-
 {% block content %}
-<div class="container mt-5">
-    <h3 class="text-center mb-4">Топранг - Рейтинг пользователей</h3>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Рейтинг</h5>
-            <p class="card-text">Здесь отображаются пользователи с наибольшим количеством баллов.</p>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Пользователь</th>
-                        <th>Баллы</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user_rating in ratings %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ user_rating.username }}</td>
-                        <td>{{ user_rating.score }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center">Нет данных для отображения.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-6 fw-light mb-0">Топ рейтинг пользователей</h1>
+    </div>
+
+    <div class="row g-4">
+        {% for user in ratings %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card shadow-sm hover-elevate">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <!-- Место в рейтинге -->
+                        <div class="position-badge bg-gradient-primary text-white me-3">
+                            {{ user.position }}
+                        </div>
+
+                        <!-- Информация -->
+                        <div class="flex-grow-1">
+                            <h5 class="mb-0">{{ user.username }}</h5>
+                            <div class="text-muted small">Общий балл</div>
+                        </div>
+
+                        <!-- Баллы -->
+                        <div class="score-display bg-gradient-success text-white">
+                            {{ user.score }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-emoji-frown me-2"></i>
+                Пока никто не прошел тесты
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
+
+<style>
+    .hover-elevate {
+        transition: transform 0.3s ease;
+    }
+
+    .hover-elevate:hover {
+        transform: translateY(-5px);
+    }
+
+    .position-badge {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .score-display {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #6C5CE7, #4A90E2);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(45deg, #00B894, #55EFC4);
+    }
+</style>
 {% endblock %}

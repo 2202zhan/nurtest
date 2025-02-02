@@ -17,6 +17,9 @@ from .forms import CustomUserCreationForm, CustomUserLoginForm
 from tests_platform.models import TestResult
 import g4f
 
+from django.db.models import Sum
+from accounts.models import CustomUser  # Импорт кастомной модели
+
 
 # Регистрация пользователя
 def register(request):
@@ -165,16 +168,17 @@ def chatgpt(request):
     return JsonResponse({"error": "Метод запроса не поддерживается"}, status=405)
 
 def toprank_view(request):
-    # Пример фиктивных данных для рейтинга
-    ratings = [
-        {"username": "User1", "score": 150},
-        {"username": "User2", "score": 130},
-        {"username": "User3", "score": 120},
-        {"username": "User4", "score": 100},
-        {"username": "User5", "score": 80},
-    ]
+    top_users = CustomUser.objects.annotate(
+        total_score=Sum('testresult__score')
+    ).exclude(total_score=None).order_by('-total_score')[:20]
 
-    # Сортируем список пользователей по убыванию баллов
-    ratings.sort(key=lambda x: x['score'], reverse=True)
+    ratings = [
+        {
+            'username': user.username,
+            'score': user.total_score,
+            'position': idx+1
+        }
+        for idx, user in enumerate(top_users)
+    ]
 
     return render(request, 'toprank.html', {'ratings': ratings})
