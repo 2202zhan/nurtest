@@ -67,6 +67,8 @@ class QuestionDeleteView(PermissionRequiredMixin, DeleteView):
     template_name = 'admin/question_confirm_delete.html'
     permission_required = 'tests.delete_question'
     success_url = reverse_lazy('test-list')
+    def get_success_url(self):
+        return reverse('question-list', kwargs={'test_id': self.object.test.pk})
 
 # Управление вариантами ответов
 class AnswerChoiceListView(PermissionRequiredMixin, ListView):
@@ -82,6 +84,8 @@ class AnswerChoiceListView(PermissionRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['question'] = Question.objects.get(id=self.kwargs['question_id'])
         return context
+    def get_success_url(self):
+        return reverse('question-list', kwargs={'test_id': self.object.test.pk})
 
 class AnswerChoiceCreateView(PermissionRequiredMixin, CreateView):
     model = AnswerChoice
@@ -89,6 +93,8 @@ class AnswerChoiceCreateView(PermissionRequiredMixin, CreateView):
     fields = ['question', 'text', 'is_correct']
     permission_required = 'tests.add_answerchoice'
     success_url = reverse_lazy('test-list')
+    def get_success_url(self):
+        return reverse('question-list', kwargs={'test_id': self.object.test.pk})
 
 class AnswerChoiceUpdateView(PermissionRequiredMixin, UpdateView):
     model = AnswerChoice
@@ -96,9 +102,16 @@ class AnswerChoiceUpdateView(PermissionRequiredMixin, UpdateView):
     fields = ['question', 'text', 'is_correct']
     permission_required = 'tests.change_answerchoice'
     success_url = reverse_lazy('test-list')
+    
+
+def get_success_url(self):
+        return reverse('question-list', kwargs={'test_id': self.object.test.pk})
 
 class AnswerChoiceDeleteView(PermissionRequiredMixin, DeleteView):
     model = AnswerChoice
     template_name = 'admin/answerchoice_confirm_delete.html'
     permission_required = 'tests.delete_answerchoice'
     success_url = reverse_lazy('test-list')
+
+    def get_success_url(self):
+        return reverse('question-list', kwargs={'test_id': self.object.test.pk})

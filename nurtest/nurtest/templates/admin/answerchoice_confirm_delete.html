@@ -6,6 +6,6 @@
     {% csrf_token %}
     <p>Вы уверены, что хотите удалить этот ответ?</p>
     <button type="submit" class="btn btn-danger">Удалить</button>
-    <a href="{% url 'answerchoice-list' question.pk %}" class="btn btn-secondary">Отмена</a>
+    <a href="{% url 'test-list' %}" class="btn btn-secondary">Отмена</a>
 </form>
 {% endblock %}
