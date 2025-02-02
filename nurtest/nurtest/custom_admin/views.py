@@ -93,8 +93,9 @@ class AnswerChoiceCreateView(PermissionRequiredMixin, CreateView):
     fields = ['question', 'text', 'is_correct']
     permission_required = 'tests.add_answerchoice'
     success_url = reverse_lazy('test-list')
-    def get_success_url(self):
-        return reverse('question-list', kwargs={'test_id': self.object.test.pk})
+
+    # def get_success_url(self):
+    #     return reverse('question-list', kwargs={'test_id': self.object.test.pk})
 
 class AnswerChoiceUpdateView(PermissionRequiredMixin, UpdateView):
     model = AnswerChoice
@@ -113,5 +114,5 @@ class AnswerChoiceDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'tests.delete_answerchoice'
     success_url = reverse_lazy('test-list')
 
-    def get_success_url(self):
-        return reverse('question-list', kwargs={'test_id': self.object.test.pk})
+    # def get_success_url(self):
+    #     return reverse('question-list', kwargs={'test_id': self.object.test.pk})

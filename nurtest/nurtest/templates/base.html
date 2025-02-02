@@ -15,12 +15,12 @@
     <div class="container-fluid">
         <!-- Логотип и ссылка на главную страницу админ-панели -->
         <a class="navbar-brand" href="{% url 'test-list' %}">Админ-панель</a>
-
+        
         <!-- Кнопка для мобильных устройств -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-
+        
         <!-- Основное меню -->
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
@@ -29,14 +29,15 @@
                     <a class="nav-link" href="{% url 'test-list' %}">Тесты</a>
                 </li>
             </ul>
-
+            
             <!-- Кнопка перехода на основную платформу -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="btn btn-outline-light" href="http://127.0.0.1:8000/accounts/">
-                        <i class="bi bi-house-door me-2"></i>На основную платформу
-                    </a>
-                </li>
+                <a class="btn btn-outline-light" href="http://127.0.0.1:8000/accounts/">
+                    <i class="bi bi-house-door me-2"></i>
+                    <span>На платформу</span>
+                </a>
+
             </ul>
         </div>
     </div>
