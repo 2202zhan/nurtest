@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from tests_platform.models import Test, Question, AnswerChoice
-
+from tests_platform.models import Test, Question, AnswerChoice 
+from django.db import models
+from django.db.models import Avg, Count, Q, Case, When, FloatField
+from django.db.models import Count, Avg, Max
 # Управление тестами
 class TestListView(PermissionRequiredMixin, ListView):
     model = Test
@@ -116,3 +118,22 @@ class AnswerChoiceDeleteView(PermissionRequiredMixin, DeleteView):
 
     # def get_success_url(self):
     #     return reverse('question-list', kwargs={'test_id': self.object.test.pk})
+
+SUCCESS_THRESHOLD = 50  # Порог успешного прохождения
+
+def test_stats(request):
+    stats = Test.objects.annotate(
+        num_attempts=Count('testresult'),
+        avg_score=Avg('testresult__score'),
+        unique_users=Count('testresult__user', distinct=True),
+        success_rate=Case(
+            When(num_attempts=0, then=0.0),
+            default=100.0 * Count(
+                'testresult', 
+                filter=Q(testresult__score__gte=SUCCESS_THRESHOLD)
+            ) / Count('testresult'),
+            output_field=FloatField()
+        )
+    ).order_by('-num_attempts')
+
+    return render(request, 'admin/test_stats.html', {'stats': stats})

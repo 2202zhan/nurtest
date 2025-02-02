@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-6 fw-light mb-0">Статистика тестов</h1>
+        <a href="{% url 'test-list' %}" class="btn btn-outline-dark rounded-pill px-4">
+            <i class="bi bi-arrow-left me-2"></i>Назад
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="bg-gradient-dark text-light">
+                            <th scope="col" class="fw-medium">#</th>
+                            <th scope="col" class="fw-medium">Название теста</th>
+                            <th scope="col" class="fw-medium">Проходов</th>
+                            <th scope="col" class="fw-medium">Средний балл</th>
+                            <th scope="col" class="fw-medium">Уникальных</th>
+                            <th scope="col" class="fw-medium">Успешность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for test in stats %}
+                        <tr class="hover-elevate">
+                            <td class="text-muted">{{ forloop.counter }}</td>
+                            <td class="fw-medium">{{ test.title }}</td>
+                            <td>
+                                <span class="badge bg-gradient-blue text-light">
+                                    {{ test.num_attempts }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-gradient-green text-light">
+                                    {{ test.avg_score|floatformat:2 }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-gradient-purple text-light">
+                                    {{ test.unique_users }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="progress progress-lg" style="height: 24px;">
+                                    <div class="progress-bar bg-gradient-orange" role="progressbar"
+                                        style="width: {{ test.success_rate }}%" data-animate="progress">
+                                        {{ test.success_rate|floatformat:2 }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-database-exclamation me-2"></i>Нет данных для отображения
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+    }
+
+    .bg-gradient-dark {
+        background: linear-gradient(45deg, #2C3E50, #34495E);
+    }
+
+    .bg-gradient-blue {
+        background: linear-gradient(45deg, #2980B9, #3498DB);
+    }
+
+    .bg-gradient-green {
+        background: linear-gradient(45deg, #27AE60, #2ECC71);
+    }
+
+    .bg-gradient-purple {
+        background: linear-gradient(45deg, #8E44AD, #9B59B6);
+    }
+
+    .bg-gradient-orange {
+        background: linear-gradient(45deg, #E67E22, #F39C12);
+    }
+
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.6rem 1rem;
+        border-radius: 0.8rem;
+        min-width: 60px;
+    }
+
+    .progress {
+        border-radius: 1rem;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    .progress-bar {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .hover-elevate {
+        transition: all 0.3s ease;
+    }
+
+    .hover-elevate:hover {
+        transform: translateY(-2px);
+        background: rgba(245, 245, 245, 0.8);
+    }
+
+    [data-animate="progress"] {
+        animation: progress-fill 1s ease-out forwards;
+    }
+
+    @keyframes progress-fill {
+        from {
+            width: 0;
+        }
+
+        to {
+            width: attr(style width);
+        }
+    }
+</style>
+{% endblock %}
