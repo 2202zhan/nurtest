@@ -11,7 +11,8 @@ urlpatterns = [
     path('tests/add/', TestCreateView.as_view(), name='test-add'),
     path('tests/<int:pk>/edit/', TestUpdateView.as_view(), name='test-edit'),
     path('tests/<int:pk>/delete/', TestDeleteView.as_view(), name='test-delete'),
-     path('stats/', test_stats, name='test-stats'),
+    path('stats/', test_stats, name='test-stats'),
+
 
     # Управление вопросами
     path('tests/<int:test_id>/questions/', QuestionListView.as_view(), name='question-list'),

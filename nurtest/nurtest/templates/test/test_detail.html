@@ -9,7 +9,13 @@
         {% csrf_token %}
         {% for question in questions %}
         <fieldset class="mb-4">
-            <legend class="h5">{{ question.text }}</legend>
+            <legend class="h5 d-flex align-items-center">
+                <span id="question-text-{{ question.id }}">{{ question.text }}</span>
+                <button type="button" class="btn btn-outline-primary btn-sm ms-2"
+                    onclick="speakQuestion({{ question.id }})">
+                    🔊 
+                </button>
+            </legend>
             <div class="mt-3">
                 {% if question.question_type == 'single' %}
                 {% for answer in question.answerchoice_set.all %}
@@ -50,4 +56,18 @@
     <p>Процент правильных ответов: {{ percentage }}%</p>
 </div>
 {% endif %}
+
+<!-- Подключаем JavaScript для озвучки вопросов -->
+<script>
+    function speakQuestion(questionId) {
+        let text = document.getElementById("question-text-" + questionId).innerText;
+        let speech = new SpeechSynthesisUtterance(text);
+        speech.lang = "ru-RU";  // Русский язык
+        speech.volume = 1;       // Громкость
+        speech.rate = 1;         // Скорость речи
+        speech.pitch = 1;        // Тембр голоса
+        window.speechSynthesis.speak(speech);
+    }
+</script>
+
 {% endblock %}

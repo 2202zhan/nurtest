@@ -6,6 +6,9 @@ from tests_platform.models import Test, Question, AnswerChoice
 from django.db import models
 from django.db.models import Avg, Count, Q, Case, When, FloatField
 from django.db.models import Count, Avg, Max
+
+
+
 # Управление тестами
 class TestListView(PermissionRequiredMixin, ListView):
     model = Test
@@ -137,3 +140,4 @@ def test_stats(request):
     ).order_by('-num_attempts')
 
     return render(request, 'admin/test_stats.html', {'stats': stats})
+
