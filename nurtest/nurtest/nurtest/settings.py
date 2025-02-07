@@ -158,3 +158,8 @@ EMAIL_HOST_USER = 'kulzhanofff@mail.ru'  # Ваша почта Mail.ru
 EMAIL_HOST_PASSWORD = 'AhuJnX4ttcksm66pNtVA'   # Пароль от почты
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# settings.py
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.CustomUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]

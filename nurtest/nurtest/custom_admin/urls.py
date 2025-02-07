@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     TestListView, TestCreateView, TestUpdateView, TestDeleteView,
     QuestionListView, QuestionCreateView, QuestionUpdateView, QuestionDeleteView,
-    AnswerChoiceListView, AnswerChoiceCreateView, AnswerChoiceUpdateView, AnswerChoiceDeleteView, test_stats
+    AnswerChoiceListView, AnswerChoiceCreateView, AnswerChoiceUpdateView, AnswerChoiceDeleteView, test_stats, block_user, unblock_user, UserListView,
 )
 
 urlpatterns = [
@@ -12,6 +12,9 @@ urlpatterns = [
     path('tests/<int:pk>/edit/', TestUpdateView.as_view(), name='test-edit'),
     path('tests/<int:pk>/delete/', TestDeleteView.as_view(), name='test-delete'),
     path('stats/', test_stats, name='test-stats'),
+    path('user/<int:user_id>/block/', block_user, name='block_user'),
+    path('user/<int:user_id>/unblock/', unblock_user, name='unblock_user'),
+    path('users/', UserListView.as_view(), name='user-list'),  # Должно быть 'user-list'
 
 
     # Управление вопросами

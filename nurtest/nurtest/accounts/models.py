@@ -4,6 +4,10 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(unique=True)
-    def __str__(self):
-        return self.username
+    is_blocked = models.BooleanField(default=False, verbose_name="Заблокирован")
+    blocked_until = models.DateTimeField(null=True, blank=True, verbose_name="Заблокирован до")
+    block_reason = models.TextField(blank=True, verbose_name="Причина блокировки")
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"

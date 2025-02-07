@@ -7,7 +7,13 @@ from django.db import models
 from django.db.models import Avg, Count, Q, Case, When, FloatField
 from django.db.models import Count, Avg, Max
 
+from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import get_object_or_404, redirect
+from accounts.models import CustomUser
 
+from django.contrib.auth.decorators import user_passes_test
+from accounts.models import CustomUser
 
 # Управление тестами
 class TestListView(PermissionRequiredMixin, ListView):
@@ -141,3 +147,34 @@ def test_stats(request):
 
     return render(request, 'admin/test_stats.html', {'stats': stats})
 
+
+
+
+
+
+
+@user_passes_test(lambda u: u.is_staff)
+def block_user(request, user_id):
+    user = get_object_or_404(CustomUser, pk=user_id)
+    
+    if request.method == 'POST':
+        user.is_blocked = True
+        user.block_reason = request.POST.get('reason', '')
+        user.save()
+        messages.success(request, f"Пользователь {user.username} заблокирован")
+    return redirect('user_list')
+
+@user_passes_test(lambda u: u.is_staff)
+def unblock_user(request, user_id):
+    user = get_object_or_404(CustomUser, pk=user_id)
+    user.is_blocked = False
+    user.block_reason = ''
+    user.save()
+    messages.success(request, f"Пользователь {user.username} разблокирован")
+    return redirect('user_list')
+
+
+class UserListView(ListView):
+    model = User = CustomUser
+    template_name = 'admin/user_list.html'
+    context_object_name = 'users'
