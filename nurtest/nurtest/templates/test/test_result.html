@@ -34,8 +34,9 @@
         </div>
     </div>
 
-    <div class="mt-4">
-        <a href="{% url 'test_result_detail' result.id %}" class="btn btn-primary">Подробнее узнать ответы</a>
-    </div>
-</div>
+{% if result %}
+<a href="{% url 'test_result_detail' result.id %}" class="btn btn-primary">Подробнее узнать ответы</a>
+{% else %}
+<p class="text-muted">Подробный разбор пока недоступен.</p>
+{% endif %}
 {% endblock %}

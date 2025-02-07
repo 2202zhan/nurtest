@@ -1,0 +1,19 @@
+{% extends 'shablons/main.html' %}
+
+{% block title %}Результаты случайного теста{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Результаты теста: {{ test.title }}</h2>
+
+    <div class="text-center">
+        <h3>Ваши результаты:</h3>
+        <p>Правильные ответы: {{ score }} / {{ questions|length }}</p>
+        <p>Процент правильных ответов: {{ percentage }}%</p>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'test-list' %}" class="btn btn-secondary">Назад к тестам</a>
+    </div>
+</div>
+{% endblock %}

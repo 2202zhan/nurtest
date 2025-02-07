@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Test, TestResult, AnswerChoice, UserAnswer
 from django.contrib.auth.decorators import login_required
-
+import random
+from .models import Question
 # Отображение списка доступных тестов
 def test_list(request):
     tests = Test.objects.filter(is_active=True)
@@ -129,3 +130,33 @@ def test_result_detail(request, result_id):
         'result': result,
         'user_answers': user_answers
     })
+
+
+
+def random_test(request):
+    test = random.choice(Test.objects.all())
+    questions = test.question_set.all()
+
+    if request.method == 'POST':
+        correct_answers = 0
+        total_questions = questions.count()
+        
+        for question in questions:
+            user_answer = request.POST.getlist(str(question.id))
+            correct_choices = question.answerchoice_set.filter(is_correct=True).values_list('id', flat=True)
+            correct_choices = set(map(str, correct_choices))
+
+            if set(user_answer) == correct_choices:
+                correct_answers += 1
+
+        percentage = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+
+        result = TestResult.objects.create(user=request.user, test=test, score=correct_answers)
+        return render(request, 'test/test_result.html', {
+    'score': correct_answers,
+    'percentage': round(percentage, 2),
+    'test': test,
+    'result': result  # <-- Добавляем в контекст
+})
+
+    return render(request, 'test/random_test.html', {'questions': questions, 'test': test})
