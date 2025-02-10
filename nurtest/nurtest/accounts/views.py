@@ -14,11 +14,11 @@ import calendar
 import json
 
 from .forms import CustomUserCreationForm, CustomUserLoginForm
-from tests_platform.models import TestResult
+from tests_platform.models import TestResult, CustomUser
 import g4f
 
 from django.db.models import Sum
-from accounts.models import CustomUser  # Импорт кастомной модели
+
 
 
 # Регистрация пользователя
@@ -36,13 +36,22 @@ def register(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
-# Вход пользователя
 def login_view(request):
     if request.method == 'POST':
         form = CustomUserLoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+            
+            # Проверка на блокировку
+            try:
+                user = CustomUser.objects.get(username=username)
+                if user.is_blocked:
+                    return redirect(reverse_lazy('blocked'))  # Перенаправление на blocked.html
+            except CustomUser.DoesNotExist:
+                pass
+            
+            # Аутентификация
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -53,6 +62,7 @@ def login_view(request):
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
         form = CustomUserLoginForm()
+    
     return render(request, 'accounts/login.html', {'form': form})
 
 

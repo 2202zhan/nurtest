@@ -7,6 +7,8 @@ from django.urls import path
 from . import views
 import custom_admin.views
 
+from django.views.generic import TemplateView
+
 urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login_view, name='login_view'),
@@ -22,6 +24,9 @@ urlpatterns = [
     path('toprank/', views.toprank_view, name='toprank'),
     path('custom-admin/', include('custom_admin.urls')),  # Кастомная админ-панель
     path('admin/users/', UserListView.as_view(), name='user_list'),
+    
+    path('blocked/', TemplateView.as_view(template_name="accounts/blocked.html"), name='blocked'),
+    
     
   
    
