@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 
+
 class CustomUser(AbstractUser):
     is_blocked = models.BooleanField(default=False, verbose_name="Заблокирован")
     blocked_until = models.DateTimeField(null=True, blank=True, verbose_name="Заблокирован до")

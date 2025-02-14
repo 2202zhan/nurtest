@@ -2,16 +2,12 @@ from django.urls import path, include
 from .views import register, login_view, home, settings, chatgpt
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth import views as auth_views
-from custom_admin.views import user_list_view, UserListView
+from custom_admin.views import UserListView
 from django.urls import path
 from . import views
 import custom_admin.views
 
 from django.views.generic import TemplateView
-
-from django.contrib.auth.decorators import user_passes_test
-from django.urls import path
-
 
 urlpatterns = [
     path('register/', register, name='register'),
@@ -27,8 +23,7 @@ urlpatterns = [
     path('chatgpt/', chatgpt, name='chatgpt'),
     path('toprank/', views.toprank_view, name='toprank'),
     path('custom-admin/', include('custom_admin.urls')),  # Кастомная админ-панель
-    path('admin/users/', user_list_view, name='user_list'),
-    
+    path('admin/users/', UserListView.as_view(), name='user_list'),
     
     path('blocked/', TemplateView.as_view(template_name="accounts/blocked.html"), name='blocked'),
     
