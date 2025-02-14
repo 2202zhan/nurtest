@@ -4,7 +4,7 @@ from .views import (
     QuestionListView, QuestionCreateView, QuestionUpdateView, QuestionDeleteView,
     AnswerChoiceListView, AnswerChoiceCreateView, AnswerChoiceUpdateView, AnswerChoiceDeleteView, test_stats, block_user, unblock_user, UserListView,
 )
-
+from . import views
 urlpatterns = [
     # Управление тестами
     path('tests/', TestListView.as_view(), name='test-list'),
@@ -15,6 +15,7 @@ urlpatterns = [
     path('user/<int:user_id>/block/', block_user, name='block_user'),
     path('user/<int:user_id>/unblock/', unblock_user, name='unblock_user'),
     path('users/', UserListView.as_view(), name='user-list'),  # Должно быть 'user-list'
+    path('admin/users/<int:user_id>/update_roles/', views.update_user_roles, name='update_user_roles'), 
 
 
     # Управление вопросами

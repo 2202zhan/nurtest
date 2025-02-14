@@ -8,12 +8,11 @@ from django.db.models import Avg, Count, Q, Case, When, FloatField
 from django.db.models import Count, Avg, Max
 
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.shortcuts import get_object_or_404, redirect
 from accounts.models import CustomUser
 
-from django.contrib.auth.decorators import user_passes_test
-from accounts.models import CustomUser
+
 
 # Управление тестами
 class TestListView(PermissionRequiredMixin, ListView):
@@ -150,7 +149,19 @@ def test_stats(request):
 
 
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)  # Только суперпользователь может изменять роли
+def update_user_roles(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
 
+    if request.method == 'POST':
+        user.can_add_tests = 'can_add_tests' in request.POST
+        user.can_edit_tests = 'can_edit_tests' in request.POST
+        user.can_delete_tests = 'can_delete_tests' in request.POST
+        user.save()
+        messages.success(request, f'Роли пользователя {user.username} обновлены!')
+    users = CustomUser.objects.all()
+    return render(request, 'admin/user_list.html', {'users': users})
 
 
 @user_passes_test(lambda u: u.is_staff)
@@ -162,7 +173,9 @@ def block_user(request, user_id):
         user.block_reason = request.POST.get('reason', '')
         user.save()
         messages.success(request, f"Пользователь {user.username} заблокирован")
-    return redirect('user_list')
+    users = CustomUser.objects.all()
+    return render(request, 'admin/user_list.html', {'users': users})
+
 
 @user_passes_test(lambda u: u.is_staff)
 def unblock_user(request, user_id):
@@ -171,10 +184,16 @@ def unblock_user(request, user_id):
     user.block_reason = ''
     user.save()
     messages.success(request, f"Пользователь {user.username} разблокирован")
-    return redirect('user_list')
+    users = CustomUser.objects.all()
+    return render(request, 'admin/user_list.html', {'users': users})
 
 
 class UserListView(ListView):
     model = User = CustomUser
     template_name = 'admin/user_list.html'
     context_object_name = 'users'
+
+def user_list_view(request):
+    print('qwdqwdqwdqw', users)
+    users = CustomUser.objects.all()
+    return render(request, 'admin/user_list.html', {'users': users})

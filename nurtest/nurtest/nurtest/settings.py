@@ -147,7 +147,6 @@ LOGOUT_REDIRECT_URL = 'register'
 # ]
 
 
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Настройки SMTP для Mail.ru
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

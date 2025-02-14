@@ -1,7 +1,7 @@
-<!-- admin/user_list.html -->
 {% extends 'base.html' %}
 
 {% block content %}
+{% if request.user.is_superuser %}
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mb-5">
         <h1 class="display-6 fw-light mb-0">Управление пользователями</h1>
@@ -17,10 +17,12 @@
                             <th>Статус</th>
                             <th>Причина блокировки</th>
                             <th>Действия</th>
+                            <!-- <th>Роли</th> -->
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in users %}
+                    
+                    {% for user in users %}
                         <tr class="{% if user.is_blocked %}table-danger{% endif %}">
                             <td>{{ user.username }}</td>
                             <td>
@@ -43,9 +45,51 @@
                                 </button>
                                 {% endif %}
                             </td>
-                        </tr>
+                            <!-- <td>
+                                <form method="POST" action="{% url 'update_user_roles' user.id %}">
+                                    {% csrf_token %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="can_add_tests"
+                                            id="addTests{{ user.id }}" {% if user.can_add_tests %}checked{% endif %}>
+                                        <label class="form-check-label" for="addTests{{ user.id }}">Добавление
+                                            тестов</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="can_edit_tests"
+                                            id="editTests{{ user.id }}" {% if user.can_edit_tests %}checked{% endif %}>
+                                        <label class="form-check-label" for="editTests{{ user.id }}">Редактирование
+                                            тестов</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="can_delete_tests"
+                                            id="deleteTests{{ user.id }}" {% if user.can_delete_tests %}checked{% endif %}>
+                                        <label class="form-check-label" for="deleteTests{{ user.id }}">Удаление
+                                            тестов</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="can_add_questions"
+                                            id="addQuestions{{ user.id }}" {% if user.can_add_questions %}checked{% endif %}>
+                                        <label class="form-check-label" for="addQuestions{{ user.id }}">Добавление
+                                            вопросов</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="can_edit_questions"
+                                            id="editQuestions{{ user.id }}" {% if user.can_edit_questions %}checked{% endif %}>
+                                        <label class="form-check-label" for="editQuestions{{ user.id }}">Редактирование
+                                            вопросов</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="can_delete_questions"
+                                            id="deleteQuestions{{ user.id }}" {% if user.can_delete_questions %}checked{% endif %}>
+                                        <label class="form-check-label" for="deleteQuestions{{ user.id }}">Удаление
+                                            вопросов</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary mt-2">Обновить</button>
+                                </form>
+                            </td>
+                        </tr> -->
 
-                        <!-- Модальное окно блокировки -->
+                        <!-- Модальное окно блокировки (перенесено внутрь tbody) -->
                         <div class="modal fade" id="blockModal{{ user.id }}" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -78,4 +122,8 @@
         </div>
     </div>
 </div>
+{% else %}
+<h3 class="text-danger">Доступ запрещен</h3>
+{% endif %}
 {% endblock %}
+
