@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 # Create your models here.
-
+from django.db import models
+from django.utils import timezone
+from django.conf import settings
+import secrets
 
 
 class CustomUser(AbstractUser):
@@ -28,3 +31,16 @@ class CustomUser(AbstractUser):
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
+
+
+class EmailConfirmationToken(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(hours=24)
+    
+    @classmethod
+    def generate_token(cls):
+        return secrets.token_urlsafe(32)

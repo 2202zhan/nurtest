@@ -14,7 +14,12 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['password1'].widget.attrs.update({'placeholder': 'Ваш пароль', 'class': 'form-input'})
         self.fields['password2'].widget.attrs.update({'placeholder': 'Подтвердите пароль', 'class': 'form-input'})
 
-
+    def save(self, commit=True):
+            user = super().save(commit=False)
+            user.is_active = False  # Пользователь неактивен до подтверждения
+            if commit:
+                user.save()
+            return user
 
 class CustomUserLoginForm(forms.Form):
     username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))

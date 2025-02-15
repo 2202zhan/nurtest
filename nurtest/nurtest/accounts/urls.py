@@ -11,6 +11,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('register/', register, name='register'),
+    path('confirm-email/<str:token>/', views.confirm_email, name='confirm_email'),
     path('login/', login_view, name='login_view'),
     path('', home, name='home'),
     path('logout/', LogoutView.as_view(), name='logout'),

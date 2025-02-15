@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Подтверждение email</title>
+    <!-- Можно добавить свои стили или подключить CSS-фреймворк -->
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 4em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            margin: 30px 0;
+            line-height: 1.6;
+        }
+
+        .resend-link {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="icon">✓</div>
+        <h1>Проверьте вашу почту!</h1>
+
+        <div class="instructions">
+            <p>Мы отправили письмо с подтверждением на адрес <strong>{{ user.email }}</strong></p>
+            <p>Перейдите по ссылке в письме, чтобы завершить регистрацию.</p>
+
+            <div class="alert">
+                <p>Если вы не видите письмо:</p>
+                <ul>
+                    <li>Проверьте папку "Спам" или "Рассылки"</li>
+                    <li>Убедитесь, что ввели правильный email</li>
+                    <li>Подождите 1-2 минуты для доставки</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

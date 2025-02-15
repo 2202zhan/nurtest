@@ -19,7 +19,9 @@ import g4f
 
 from django.db.models import Sum
 
-
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from .models import EmailConfirmationToken
 
 # Регистрация пользователя
 def register(request):
@@ -27,13 +29,62 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            return redirect('home')
+            
+            # Создаем токен подтверждения
+            token = EmailConfirmationToken.generate_token()
+            EmailConfirmationToken.objects.create(
+                user=user,
+                token=token
+            )
+            
+            # Отправляем письмо с подтверждением
+            current_site = get_current_site(request)
+            confirm_url = f"http://{current_site.domain}/accounts/confirm-email/{token}/"
+            
+            send_mail(
+                'Подтверждение регистрации',
+                f'Для завершения регистрации перейдите по ссылке: {confirm_url}',
+                'kulzhanofff@mail.ru',
+                [user.email],
+                fail_silently=False,
+            )
+            
+            # Рендерим страницу с уведомлением вместо редиректа
+            return render(request, 'accounts/email_confirmation_sent.html', {'user': user})
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
         form = CustomUserCreationForm()
     return render(request, 'accounts/register.html', {'form': form})
+
+def confirm_email(request, token):
+    print(f"Получен токен: {token}")  # Проверка, какой токен приходит в функцию
+
+    try:
+        token_obj = EmailConfirmationToken.objects.get(token=token)
+        print(f"Токен найден в базе: {token_obj}")  # Проверка, найден ли токен
+
+        if token_obj.is_expired():
+            print("Токен истёк")  # Проверка, истёк ли токен
+            messages.error(request, 'Срок действия ссылки истёк.')
+            return redirect('register')
+        
+        user = token_obj.user
+        print(f"Активируем пользователя: {user.email}")  # Проверка, какого пользователя активируем
+
+        user.is_active = True
+        user.save()
+        token_obj.delete()
+
+        print("Email подтверждён, токен удалён")  # Подтверждение, что всё прошло успешно
+        messages.success(request, 'Email успешно подтверждён! Теперь вы можете войти.')
+        return redirect('login_view') 
+
+    except EmailConfirmationToken.DoesNotExist:
+        print("Ошибка: Токен не найден в базе")  # Если токен не найден
+        messages.error(request, 'Неверная ссылка подтверждения.')
+        return redirect('register')
+
 
 
 def login_view(request):
@@ -47,17 +98,19 @@ def login_view(request):
             try:
                 user = CustomUser.objects.get(username=username)
                 if user.is_blocked:
-                    return redirect(reverse_lazy('blocked'))  # Перенаправление на blocked.html
+                    return redirect('accounts/blocked.html')
             except CustomUser.DoesNotExist:
                 pass
             
-            # Аутентификация
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                login(request, user)
-                return redirect('home')
+                if user.is_active:
+                    login(request, user)
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Аккаунт не активирован. Проверьте вашу почту.')
             else:
-                messages.error(request, 'Неверное имя пользователя или пароль')
+                messages.error(request, 'Неверное имя пользователя или пароль.')
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
