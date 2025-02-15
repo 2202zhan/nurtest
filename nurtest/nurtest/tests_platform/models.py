@@ -17,6 +17,8 @@ class Test(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    views = models.PositiveIntegerField(default=0)  # Поле для популярности
+    rating = models.FloatField(default=0.0)  # Поле для рейтинга
 
     def __str__(self):
         return self.title

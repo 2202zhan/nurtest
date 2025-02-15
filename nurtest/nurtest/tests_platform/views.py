@@ -3,6 +3,11 @@ from .models import Test, TestResult, AnswerChoice, UserAnswer
 from django.contrib.auth.decorators import login_required
 import random
 from .models import Question
+
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from .models import Test, Category
+
 # Отображение списка доступных тестов
 def test_list(request):
     tests = Test.objects.filter(is_active=True)
@@ -160,3 +165,18 @@ def random_test(request):
 })
 
     return render(request, 'test/random_test.html', {'questions': questions, 'test': test})
+
+def test_list(request):
+    query = request.GET.get('q', '')  # Получаем строку поиска
+    tests = Test.objects.filter(title__icontains=query) if query else Test.objects.all()
+
+    paginator = Paginator(tests, 3)  
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'tests': tests,
+        'page_obj': page_obj,
+        'query': query,  # Передаем введенный запрос обратно в шаблон
+    }
+    return render(request, 'test/tests.html', context)
