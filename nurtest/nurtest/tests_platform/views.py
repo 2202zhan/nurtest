@@ -79,11 +79,17 @@ def process_answers(request, questions, test_result):
     
     return score, total_points
 
-# Страница прохождения теста
+from django.core.paginator import Paginator
+
 @login_required
 def test_detail(request, test_id):
     test = get_object_or_404(Test, id=test_id)
     questions = test.question_set.all()
+
+    # Добавляем пагинацию (по 5 вопросов на страницу)
+    paginator = Paginator(questions, 5)  
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     if request.method == 'POST':
         test_result = TestResult.objects.create(user=request.user, test=test, score=0)
@@ -91,19 +97,20 @@ def test_detail(request, test_id):
         test_result.score = score
         test_result.save()
 
-        # Вычисление процента правильных ответов
-        total_questions = test.question_set.count()
-        # Если у нас есть хотя бы один вопрос, вычисляем процент
         percentage = (score / total_points) * 100 if total_points > 0 else 0
 
         return render(request, 'test/test_result.html', {
             'test': test,
             'score': score,
-            'percentage': percentage,  # Процент правильных ответов
+            'percentage': percentage,
             'result': test_result
         })
 
-    return render(request, 'test/test_detail.html', {'test': test, 'questions': questions})
+    return render(request, 'test/test_detail.html', {
+        'test': test,
+        'page_obj': page_obj,  # Передаем объект страницы
+    })
+
 
 # Просмотр результатов теста
 @login_required
