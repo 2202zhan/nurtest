@@ -34,9 +34,20 @@
         </div>
     </div>
 
-{% if result %}
-<a href="{% url 'test_result_detail' result.id %}" class="btn btn-primary">Подробнее узнать ответы</a>
-{% else %}
-<p class="text-muted">Подробный разбор пока недоступен.</p>
-{% endif %}
+    {% if result %}
+    <a href="{% url 'test_result_detail' result.id %}" class="btn btn-primary">Подробнее узнать ответы</a>
+    {% else %}
+    <p class="text-muted">Подробный разбор пока недоступен.</p>
+    {% endif %}
+</div>
+
+<!-- JavaScript для очистки localStorage после просмотра результатов -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Очистка данных из localStorage после загрузки страницы с результатами
+        localStorage.removeItem("answers");
+        localStorage.removeItem("test_timer");
+    });
+</script>
+
 {% endblock %}

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'tests_platform',
     'custom_admin',
     'bootstrap5',
+    'widget_tweaks',
     
 ]
 

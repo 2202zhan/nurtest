@@ -7,27 +7,30 @@ from .models import Question
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from .models import Test, Category
-
+from django import template
 # Отображение списка доступных тестов
 def test_list(request):
     tests = Test.objects.filter(is_active=True)
     return render(request, 'test/tests.html', {'tests': tests})
 
-# Обработка ответов на вопросы
 @login_required
 def process_answers(request, questions, test_result):
     score = 0
-    total_points = 0  # Считаем общий балл за все вопросы
+    total_points = 0
+    user_answers_dict = {}  # Словарь для хранения ответов
+
     for question in questions:
         selected_answer = request.POST.get(str(question.id))
         if selected_answer:
+            user_answers_dict[question.id] = selected_answer  # Сохраняем ответ в словарь
+
             # Для одиночного ответа (radio)
             if question.question_type == 'single':
                 try:
                     answer_choice = AnswerChoice.objects.get(id=selected_answer)
                     if answer_choice.is_correct:
                         score += question.points
-                    total_points += question.points  # Максимум баллов за этот вопрос
+                    total_points += question.points
                     UserAnswer.objects.create(
                         question=question,
                         selected_answer=answer_choice,
@@ -55,16 +58,13 @@ def process_answers(request, questions, test_result):
                     except AnswerChoice.DoesNotExist:
                         continue
 
-                # Рассчитываем баллы для многократных вопросов
                 if selected_correct_count == correct_count:
-                    score += question.points  # Все правильные ответы выбраны
+                    score += question.points
                 else:
-                    # Если выбраны только некоторые правильные ответы, начисляем баллы пропорционально
                     score += question.points * (selected_correct_count / correct_count)
 
-                total_points += question.points  # Максимум баллов за этот вопрос
+                total_points += question.points
 
-            # Обработка текстового ответа
             elif question.question_type == 'text':
                 text_answer = selected_answer.strip()
                 UserAnswer.objects.create(
@@ -72,11 +72,14 @@ def process_answers(request, questions, test_result):
                     text_answer=text_answer,
                     test_result=test_result
                 )
-                total_points += question.points  # Максимум баллов за текстовый вопрос
+                total_points += question.points
+
         else:
-            # Если нет ответа, то не начисляется балл
-            total_points += question.points  # Максимум баллов за этот вопрос (за невыполненный)
-    
+            total_points += question.points  # Если ответа нет, баллы за вопрос все равно начисляются
+
+    # Сохраняем ответы в сессию
+    request.session['user_answers'] = user_answers_dict
+
     return score, total_points
 
 from django.core.paginator import Paginator
@@ -112,37 +115,69 @@ def test_detail(request, test_id):
     })
 
 
-# Просмотр результатов теста
 @login_required
-def test_result(request, result_id):
-    result = get_object_or_404(TestResult, id=result_id)
-    test = result.test
-    score = result.score
-    total_questions = test.question_set.count()
+def test_detail(request, test_id):
+    test = get_object_or_404(Test, id=test_id)
+    questions = test.question_set.all()
 
-    # Получаем количество правильных ответов и общий балл для теста
-    total_points = test.question_set.aggregate(total_points=models.Sum('points'))['total_points'] or 0
+    # Пагинация (по 5 вопросов на страницу)
+    paginator = Paginator(questions, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    # Вычисляем процент правильных ответов
-    percentage = (score / total_points) * 100 if total_points > 0 else 0
+    # Извлекаем сохраненные ответы из сессии
+    saved_answers = request.session.get('user_answers', {})
 
-    return render(request, 'test/test_result.html', {
+    if request.method == 'POST':
+        # Сохраняем ответы в сессии
+        user_answers = {}
+        for question in test.question_set.all():
+            selected_answer_id = request.POST.get(f'question_{question.id}')
+            if selected_answer_id:
+                user_answers[question.id] = selected_answer_id
+
+        # Сохраняем в сессии
+        request.session['user_answers'] = user_answers
+
+        # Сохраняем результат теста
+        test_result = TestResult.objects.create(user=request.user, test=test, score=0)
+        score, total_points = process_answers(request, questions, test_result)
+        test_result.score = score
+        test_result.save()
+
+        percentage = (score / total_points) * 100 if total_points > 0 else 0
+
+        # Очистить сохраненные ответы после завершения теста
+        request.session.pop('user_answers', None)
+
+        return render(request, 'test/test_result.html', {
+            'test': test,
+            'score': score,
+            'percentage': percentage,
+            'result': test_result
+        })
+
+    return render(request, 'test/test_detail.html', {
         'test': test,
-        'score': score,
-        'percentage': percentage,  # Процент правильных ответов
-        'result': result,
+        'page_obj': page_obj,
+        'saved_answers': saved_answers,  # Передаем сохраненные ответы
     })
-
 # Детализация ответов пользователя на тест
 @login_required
 def test_result_detail(request, result_id):
     result = get_object_or_404(TestResult, id=result_id)
     user_answers = UserAnswer.objects.filter(test_result=result)
+
+    # Собираем ответы для всех вопросов
+    question_answers = {}
+    for answer in user_answers:
+        question_answers[answer.question.id] = answer.selected_answer.id
+
     return render(request, 'test/test_result_detail.html', {
         'result': result,
-        'user_answers': user_answers
+        'user_answers': user_answers,
+        'question_answers': question_answers  # Передаем все ответы по вопросам
     })
-
 
 
 def random_test(request):
@@ -187,3 +222,11 @@ def test_list(request):
         'query': query,  # Передаем введенный запрос обратно в шаблон
     }
     return render(request, 'test/tests.html', context)
+
+
+
+register = template.Library()
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

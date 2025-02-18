@@ -98,7 +98,7 @@ def login_view(request):
             try:
                 user = CustomUser.objects.get(username=username)
                 if user.is_blocked:
-                    return redirect('accounts/blocked.html')
+                    return redirect('blocked')
             except CustomUser.DoesNotExist:
                 pass
             
@@ -193,12 +193,47 @@ def generate_month_activity_calendar(user, year, month):
 
     return calendar_data
 
-
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
+from django.shortcuts import render
+from django.contrib import messages
+from django.contrib.auth import get_user_model
 # Настройки пользователя
 @login_required
 def settings(request):
     return render(request, 'accounts/settings.html')
 
+
+User = get_user_model()  # Получаем кастомную модель пользователя
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'accounts/password_reset.html'
+    success_url = reverse_lazy('password_reset_done')
+    email_template_name = 'accounts/password_reset_email.html'
+    form_class = PasswordResetForm
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            form.save(request=self.request)
+            messages.success(self.request, "✅ Ссылка для сброса пароля отправлена на вашу почту.")
+
+        else:
+            messages.error(self.request, "⚠️ Пользователь с таким email не найден.")
+        return super().form_valid(form)
+
+from django.contrib.auth import views as auth_views
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = 'accounts/password_reset_confirm.html'  # Шаблон для ввода нового пароля
+    success_url = reverse_lazy('login_view')  # После сброса перенаправляем на логин
+
+    def form_valid(self, form):
+        messages.success(self.request, "✅ Пароль успешно изменен! Теперь можете войти в аккаунт.")
+        return super().form_valid(form)
+    
 
 # Чат с AI
 @csrf_exempt

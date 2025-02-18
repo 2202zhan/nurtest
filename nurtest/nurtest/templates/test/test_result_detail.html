@@ -45,4 +45,13 @@
             тестов</a>
     </div>
 </div>
+
+<!-- JavaScript для очистки localStorage после просмотра результатов -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Очистка данных из localStorage после просмотра результатов
+        localStorage.removeItem("answers");
+        localStorage.removeItem("test_timer");
+    });
+</script>
 {% endblock %}

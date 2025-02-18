@@ -7,9 +7,9 @@
     <div class="alert alert-danger text-center fw-bold fs-5" id="timer-container">
         Время: <span id="timer">05:00</span>
     </div>
-    
+
     <h2 class="text-center mb-4">{{ test.title }}</h2>
-    <form method="POST" class="needs-validation" novalidate>
+    <form method="POST" class="needs-validation" novalidate id="test-form">
         {% csrf_token %}
         {% for question in page_obj %}
         <fieldset class="mb-4">
@@ -25,7 +25,8 @@
                 {% for answer in question.answerchoice_set.all %}
                 <div class="form-check">
                     <input type="radio" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
-                        name="{{ question.id }}" value="{{ answer.id }}" required>
+                        name="{{ question.id }}" value="{{ answer.id }}" required
+                        onclick="saveAnswer({{ question.id }}, '{{ answer.id }}')">
                     <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
                         {{ answer.text }}
                     </label>
@@ -35,14 +36,16 @@
                 {% for answer in question.answerchoice_set.all %}
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
-                        name="{{ question.id }}" value="{{ answer.id }}">
+                        name="{{ question.id }}" value="{{ answer.id }}"
+                        onclick="saveAnswer({{ question.id }}, '{{ answer.id }}')">
                     <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
                         {{ answer.text }}
                     </label>
                 </div>
                 {% endfor %}
                 {% elif question.question_type == 'text' %}
-                <textarea class="form-control mt-2" name="{{ question.id }}" rows="3" required></textarea>
+                <textarea class="form-control mt-2" name="{{ question.id }}" rows="3" required
+                    oninput="saveTextAnswer({{ question.id }}, this.value)"></textarea>
                 {% endif %}
             </div>
         </fieldset>
@@ -102,36 +105,78 @@
     }
 
     // Таймер
-       document.addEventListener("DOMContentLoaded", function () {
-            let totalTime = 5 * 60;  // 15 минут в секундах
-            let timerKey = "test_timer";  // Ключ для хранения таймера в localStorage
-            let savedTime = localStorage.getItem(timerKey);
-            let timeLeft = savedTime ? parseInt(savedTime) : totalTime;
-            let timerElement = document.getElementById("timer");
+    document.addEventListener("DOMContentLoaded", function () {
+        let totalTime = 5 * 60;  // 5 минут в секундах
+        let timerKey = "test_timer";  // Ключ для хранения таймера в localStorage
+        let savedTime = localStorage.getItem(timerKey);
+        let timeLeft = savedTime ? parseInt(savedTime) : totalTime;
+        let timerElement = document.getElementById("timer");
 
-            function updateTimer() {
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-                timerElement.innerText = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+        function updateTimer() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timerElement.innerText = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 
-                if (timeLeft <= 0) {
-                    localStorage.removeItem(timerKey);
-                    document.forms[0].submit();  // Отправляем тест при окончании времени
-                } else {
-                    timeLeft--;
-                    localStorage.setItem(timerKey, timeLeft);
-                    setTimeout(updateTimer, 1000);
-                }
-            }
-
-            updateTimer();
-
-            // Сброс таймера при закрытии вкладки или переходе на другую страницу
-            window.addEventListener("beforeunload", function () {
+            if (timeLeft <= 0) {
                 localStorage.removeItem(timerKey);
-            });
+                document.forms[0].submit();  // Отправляем тест при окончании времени
+            } else {
+                timeLeft--;
+                localStorage.setItem(timerKey, timeLeft);
+                setTimeout(updateTimer, 1000);
+            }
+        }
+
+        updateTimer();
+
+        // Сброс таймера при закрытии вкладки или переходе на другую страницу
+        window.addEventListener("beforeunload", function () {
+            localStorage.removeItem(timerKey);
         });
-        
+    });
+
+    // Функция для сохранения выбранных ответов в localStorage
+    function saveAnswer(questionId, answerId) {
+        let answers = JSON.parse(localStorage.getItem("answers")) || {};
+        answers[questionId] = answerId;
+        localStorage.setItem("answers", JSON.stringify(answers));
+    }
+
+    // Функция для сохранения текстового ответа
+    function saveTextAnswer(questionId, answerText) {
+        let answers = JSON.parse(localStorage.getItem("answers")) || {};
+        answers[questionId] = answerText;
+        localStorage.setItem("answers", JSON.stringify(answers));
+    }
+
+    // Загрузка сохраненных ответов при перезагрузке страницы
+    window.addEventListener("load", function () {
+        let savedAnswers = JSON.parse(localStorage.getItem("answers")) || {};
+        for (let questionId in savedAnswers) {
+            let savedAnswer = savedAnswers[questionId];
+            let radioInput = document.querySelector(`input[name="${questionId}"][value="${savedAnswer}"]`);
+            if (radioInput) {
+                radioInput.checked = true;
+            } else {
+                let checkboxInputs = document.querySelectorAll(`input[name="${questionId}"]`);
+                checkboxInputs.forEach(function (checkbox) {
+                    if (savedAnswer.includes(checkbox.value)) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+            let textArea = document.querySelector(`textarea[name="${questionId}"]`);
+            if (textArea) {
+                textArea.value = savedAnswer;
+            }
+        }
+    });
+
+    // Очистка сохраненных ответов при отправке формы
+    document.getElementById("test-form").addEventListener("submit", function () {
+        localStorage.removeItem("answers");
+        localStorage.removeItem("test_timer");
+    });
 </script>
 
 {% endblock %}
