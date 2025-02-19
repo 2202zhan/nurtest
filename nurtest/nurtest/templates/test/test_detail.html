@@ -178,5 +178,49 @@
         localStorage.removeItem("test_timer");
     });
 </script>
+<style>
+    /* Улучшенный UX для мобильных */
+    @media (max-width: 576px) {
+        .container {
+            padding: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        legend {
+            font-size: 18px;
+        }
+
+        .form-check-label {
+            font-size: 16px;
+        }
+
+        textarea {
+            font-size: 16px;
+        }
+
+        /* Таймер */
+        #timer-container {
+            font-size: 18px;
+            padding: 12px;
+        }
+
+        /* Кнопка озвучки */
+        .speak-btn {
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* Пагинация */
+        .pagination .page-link {
+            font-size: 14px;
+            padding: 8px;
+        }
+    }
+</style>
 
 {% endblock %}

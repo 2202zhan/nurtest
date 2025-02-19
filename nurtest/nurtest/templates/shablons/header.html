@@ -1,49 +1,121 @@
-<!-- navbar.html -->
-<header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">NUR test</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/accounts' %}active{% endif %}" aria-current="page"
-                            href="{% url 'home' %}">Главная</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/test_list/' %}active{% endif %}"
-                            href="{% url 'test_list' %}">Тесты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/settings/' %}active{% endif %}"
-                            href="{% url 'settings' %}">Настройки</a>
-                    </li>
-                <!-- Кнопка Топранг -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/toprank/' %}active{% endif %}" href="{% url 'toprank' %}">
-                        Топранг
-                    </a>
-                </li>
+<!DOCTYPE html>
+<html lang="ru">
 
-                    <!-- Кнопка Админ-панели -->
-                    {% if user.is_authenticated and user.is_staff %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path|slice:'0:13' == '/custom-admin/' %}active{% endif %}"
-                            href="{% url 'test-list' %}" style="color: #fcfcfc8b; font-weight: normal;">
-                            Админ-панель
-                        </a>
-                    </li>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUR Test</title>
+    <!-- Подключение Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключение кастомных стилей -->
+    <style>
+        /* Плавная анимация для меню */
+        .navbar-collapse {
+            transition: max-height 0.4s ease-in-out;
+        }
+
+        /* Улучшения для мобильной версии */
+        @media (max-width: 991px) {
+            .navbar-nav .nav-item {
+                margin: 8px 0;
+            }
+
+            .navbar-nav .btn {
+                width: 100%;
+                margin-top: 15px;
+            }
+
+            .navbar-collapse {
+                background: rgba(8, 92, 228, 0.225);
+                padding: 20px;
+                margin-top: 10px;
+                border-radius: 5px;
+            }
+        }
+
+        /* Анимация иконки бургер-меню */
+        .navbar-toggler-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <!-- Логотип -->
+                <a class="navbar-brand" href="{% url 'home' %}">NUR Test</a>
+
+                <!-- Кнопка бургер-меню -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Основное меню -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                                href="{% url 'home' %}">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'test_list' %}active{% endif %}"
+                                href="{% url 'test_list' %}">Тесты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+                                href="{% url 'settings' %}">Настройки</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'toprank' %}active{% endif %}"
+                                href="{% url 'toprank' %}">Топранг</a>
+                        </li>
+                        {% if user.is_authenticated and user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'test-list' %}active{% endif %}"
+                                href="{% url 'test-list' %}">Админ-панель</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- Блок авторизации -->
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Выйти</a>
                     {% endif %}
-                </ul>
-
-                {% if user.is_authenticated %}
-                <!-- Кнопка "Выйти" -->
-                <a href="{% url 'logout' %}" class="btn btn-danger">Выйти</a>
-                {% endif %}
+                </div>
             </div>
-        </div>
-    </nav>
-</header>
+        </nav>
+    </header>
+
+    <!-- Подключение Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Кастомный JS для закрытия меню на мобильных устройствах -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const navLinks = document.querySelectorAll("#navbarNav .nav-link");
+            const navbarToggler = document.querySelector(".navbar-toggler");
+
+            navLinks.forEach(function (link) {
+                link.addEventListener("click", function () {
+                    if (window.innerWidth < 992) {
+                        const bsCollapse = new bootstrap.Collapse(document.getElementById("navbarNav"));
+                        bsCollapse.hide();
+                    }
+                });
+            });
+
+            // Изменение состояния кнопки бургера
+            navbarToggler.addEventListener("click", function () {
+                this.setAttribute("aria-expanded", this.classList.contains("collapsed") ? "false" : "true");
+            });
+        });
+    </script>
+</body>
+
+</html>

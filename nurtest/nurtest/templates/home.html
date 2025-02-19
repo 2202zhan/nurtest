@@ -5,22 +5,18 @@
 
 {% block content %}
 <div class="container mt-5">
-    <!-- Заголовок -->
     <header class="text-center py-4">
         {% if user.is_authenticated %}
         <h1 class="fw-bold">Добро пожаловать, {{ user.username }}</h1>
         <p class="text-muted">Платформа для прохождения тестов и отслеживания своей активности.</p>
         {% else %}
         <h1 class="fw-bold">Добро пожаловать, Гость!</h1>
-        <p class="text-muted">Пожалуйста, войдите в систему, чтобы увидеть свою активность и использовать платформу.</p>
+        <p class="text-muted">Пожалуйста, войдите в систему, чтобы использовать платформу.</p>
         {% endif %}
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-             
     </header>
 
-    
     {% if user.is_authenticated %}
-    <!-- Календарь активности -->
     <section class="calendar-section">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <a class="btn btn-outline-primary" href="?year={{ prev_month.year }}&month={{ prev_month.month }}">
@@ -33,7 +29,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-bordered text-center">
+            <table class="table table-bordered text-center calendar-table">
                 <thead class="bg-light">
                     <tr>
                         <th>Пн</th>
@@ -64,10 +60,9 @@
         </div>
     </section>
 
-    <!-- Легенда -->
     <section class="legend mt-5 text-center">
         <h5 class="mb-4">Что означают цвета?</h5>
-        <div class="d-flex justify-content-center gap-3">
+        <div class="d-flex flex-wrap justify-content-center gap-3">
             <div class="legend-item">
                 <div class="color-box" style="background-color: #4CAF50;"></div>
                 <span>Много активности</span>
@@ -86,13 +81,16 @@
             </div>
         </div>
     </section>
+    
+</div>
 
 <!-- Чат с AI -->
 <section class="mt-5">
     <!-- Кнопка открытия чата -->
-    <div id="chat-button-container" class="position-fixed" style="right: 10px; bottom: 10px; z-index: 1050;">
+    <div id="chat-button-container" class="position-fixed d-flex align-items-center justify-content-center"
+        style="right: 10px; bottom: 10px; z-index: 1050;">
         <button id="open-chat"
-            class="btn btn-outline-success rounded-circle p-3 d-flex align-items-center justify-content-center"
+            class="btn btn-outline-success rounded-circle d-flex align-items-center justify-content-center"
             style="width: 60px; height: 60px;">
             <i class="bi bi-chat-dots" style="font-size: 24px;"></i>
         </button>
@@ -100,16 +98,17 @@
 
     <!-- Модальное окно чата -->
     <div class="modal fade" id="chat-modal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="chatModalLabel">ChatGPT</h5>
                     <button type="button" id="close-chat" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Закрыть"></button>
                 </div>
-                <div class="modal-body">
-                    <div id="chat-window" class="mb-3" style="max-height: 300px; overflow-y: scroll;">
-                        <!-- Сообщения будут здесь -->
+                <div class="modal-body d-flex flex-column">
+                    <div id="chat-window" class="flex-grow-1 mb-3 p-2 border rounded"
+                        style="max-height: 60vh; overflow-y: auto;">
+                        <!-- Сообщения -->
                     </div>
                     <div class="input-group">
                         <input type="text" id="user-input" class="form-control"
@@ -172,6 +171,46 @@
 
 <!-- Стили и скрипты остаются без изменений -->
 <style>
+
+    @media (max-width: 576px) {
+        #chat-button-container button {
+            width: 50px;
+            height: 50px;
+        }
+
+        #chat-button-container i {
+            font-size: 20px;
+        }
+
+        #chat-window {
+            max-height: 50vh;
+        }
+    }
+
+     .calendar-table th, .calendar-table td {
+        padding: 10px;
+        font-size: 1rem;
+    }
+
+    .color-box {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .calendar-table th, .calendar-table td {
+            padding: 5px;
+            font-size: 0.8rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+    }
+
     .day-cell {
         height: 70px;
         width: 70px;
