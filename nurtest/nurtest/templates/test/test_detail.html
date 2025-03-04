@@ -3,224 +3,276 @@
 {% block title %}{{ test.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="alert alert-danger text-center fw-bold fs-5" id="timer-container">
-        Время: <span id="timer">05:00</span>
+<div class="container-lg py-4">
+    <!-- Таймер -->
+    <div class="glass-timer mb-4 p-3 text-center">
+        <div class="d-flex align-items-center justify-content-center gap-2">
+            <i class="bi bi-clock-history fs-5"></i>
+            <span id="timer" class="fw-bold fs-4">05:00</span>
+        </div>
     </div>
 
-    <h2 class="text-center mb-4">{{ test.title }}</h2>
+    <!-- Заголовок теста -->
+    <h1 class="text-center mb-5 display-6 fw-light">{{ test.title }}</h1>
+
+    <!-- Форма теста -->
     <form method="POST" class="needs-validation" novalidate id="test-form">
         {% csrf_token %}
         {% for question in page_obj %}
-        <fieldset class="mb-4">
-            <legend class="h5 d-flex align-items-center">
-                <span id="question-text-{{ question.id }}">{{ question.text }}</span>
-                <button type="button" class="btn btn-outline-primary btn-sm ms-2"
-                    onclick="speakQuestion({{ question.id }})">
-                    🔊
-                </button>
-            </legend>
-            <div class="mt-3">
-                {% if question.question_type == 'single' %}
-                {% for answer in question.answerchoice_set.all %}
-                <div class="form-check">
-                    <input type="radio" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
-                        name="{{ question.id }}" value="{{ answer.id }}" required
-                        onclick="saveAnswer({{ question.id }}, '{{ answer.id }}')">
-                    <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
-                        {{ answer.text }}
-                    </label>
+        <div class="card glass-card mb-4">
+            <div class="card-body">
+                <!-- Вопрос -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0">
+                        <span id="question-text-{{ question.id }}">{{ question.text }}</span>
+                    </h3>
+                    <button type="button" class="btn btn-icon rounded-circle hover-scale"
+                        onclick="speakQuestion({{ question.id }})" aria-label="Озвучить вопрос">
+                        <i class="bi bi-soundwave fs-5"></i>
+                    </button>
                 </div>
-                {% endfor %}
-                {% elif question.question_type == 'multiple' %}
-                {% for answer in question.answerchoice_set.all %}
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
-                        name="{{ question.id }}" value="{{ answer.id }}"
-                        onclick="saveAnswer({{ question.id }}, '{{ answer.id }}')">
-                    <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
-                        {{ answer.text }}
-                    </label>
+
+                <!-- Варианты ответов -->
+                <div class="answers-container">
+                    {% if question.question_type == 'single' %}
+                    {% for answer in question.answerchoice_set.all %}
+                    <div class="form-check custom-radio">
+                        <input type="radio" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
+                            name="{{ question.id }}" value="{{ answer.id }}" required
+                            onchange="saveAnswer({{ question.id }}, '{{ answer.id }}')">
+                        <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
+                            {{ answer.text }}
+                        </label>
+                    </div>
+                    {% endfor %}
+
+                    {% elif question.question_type == 'multiple' %}
+                    {% for answer in question.answerchoice_set.all %}
+                    <div class="form-check custom-checkbox">
+                        <input type="checkbox" class="form-check-input" id="question_{{ question.id }}_{{ answer.id }}"
+                            name="{{ question.id }}" value="{{ answer.id }}"
+                            onchange="saveAnswer({{ question.id }}, '{{ answer.id }}')">
+                        <label class="form-check-label" for="question_{{ question.id }}_{{ answer.id }}">
+                            {{ answer.text }}
+                        </label>
+                    </div>
+                    {% endfor %}
+
+                    {% elif question.question_type == 'text' %}
+                    <textarea class="form-control autosize-textarea" name="{{ question.id }}" rows="2" required
+                        oninput="saveTextAnswer({{ question.id }}, this.value)"
+                        placeholder="Введите ваш ответ..."></textarea>
+                    {% endif %}
                 </div>
-                {% endfor %}
-                {% elif question.question_type == 'text' %}
-                <textarea class="form-control mt-2" name="{{ question.id }}" rows="3" required
-                    oninput="saveTextAnswer({{ question.id }}, this.value)"></textarea>
-                {% endif %}
             </div>
-        </fieldset>
+        </div>
         {% endfor %}
 
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right"></i> Отправить ответы</button>
+        <!-- Навигация -->
+        <div class="sticky-footer">
+            <div class="d-flex justify-content-between gap-3">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary rounded-pill hover-scale">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary flex-grow-1 rounded-pill hover-scale py-2">
+                    <i class="bi bi-send me-2"></i>Завершить тест
+                </button>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary rounded-pill hover-scale">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
         </div>
     </form>
-
-    <!-- Пагинация -->
-    {% if page_obj.has_other_pages %}
-    <nav aria-label="Навигация по страницам">
-        <ul class="pagination justify-content-center mt-4">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1">Первая</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
-            </li>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% else %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-            </li>
-            {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
 </div>
 
-<!-- JavaScript для озвучки -->
-<script>
-    function speakQuestion(questionId) {
-        let text = document.getElementById("question-text-" + questionId).innerText;
-        let speech = new SpeechSynthesisUtterance(text);
-        speech.lang = "ru-RU";
-        speech.volume = 1;
-        speech.rate = 1;
-        speech.pitch = 1;
-        window.speechSynthesis.speak(speech);
-    }
-
-    // Таймер
-    document.addEventListener("DOMContentLoaded", function () {
-        let totalTime = 5 * 60;  // 5 минут в секундах
-        let timerKey = "test_timer";  // Ключ для хранения таймера в localStorage
-        let savedTime = localStorage.getItem(timerKey);
-        let timeLeft = savedTime ? parseInt(savedTime) : totalTime;
-        let timerElement = document.getElementById("timer");
-
-        function updateTimer() {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-            timerElement.innerText = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-
-            if (timeLeft <= 0) {
-                localStorage.removeItem(timerKey);
-                document.forms[0].submit();  // Отправляем тест при окончании времени
-            } else {
-                timeLeft--;
-                localStorage.setItem(timerKey, timeLeft);
-                setTimeout(updateTimer, 1000);
-            }
-        }
-
-        updateTimer();
-
-        // Сброс таймера при закрытии вкладки или переходе на другую страницу
-        window.addEventListener("beforeunload", function () {
-            localStorage.removeItem(timerKey);
-        });
-    });
-
-    // Функция для сохранения выбранных ответов в localStorage
-    function saveAnswer(questionId, answerId) {
-        let answers = JSON.parse(localStorage.getItem("answers")) || {};
-        answers[questionId] = answerId;
-        localStorage.setItem("answers", JSON.stringify(answers));
-    }
-
-    // Функция для сохранения текстового ответа
-    function saveTextAnswer(questionId, answerText) {
-        let answers = JSON.parse(localStorage.getItem("answers")) || {};
-        answers[questionId] = answerText;
-        localStorage.setItem("answers", JSON.stringify(answers));
-    }
-
-    // Загрузка сохраненных ответов при перезагрузке страницы
-    window.addEventListener("load", function () {
-        let savedAnswers = JSON.parse(localStorage.getItem("answers")) || {};
-        for (let questionId in savedAnswers) {
-            let savedAnswer = savedAnswers[questionId];
-            let radioInput = document.querySelector(`input[name="${questionId}"][value="${savedAnswer}"]`);
-            if (radioInput) {
-                radioInput.checked = true;
-            } else {
-                let checkboxInputs = document.querySelectorAll(`input[name="${questionId}"]`);
-                checkboxInputs.forEach(function (checkbox) {
-                    if (savedAnswer.includes(checkbox.value)) {
-                        checkbox.checked = true;
-                    }
-                });
-            }
-            let textArea = document.querySelector(`textarea[name="${questionId}"]`);
-            if (textArea) {
-                textArea.value = savedAnswer;
-            }
-        }
-    });
-
-    // Очистка сохраненных ответов при отправке формы
-    document.getElementById("test-form").addEventListener("submit", function () {
-        localStorage.removeItem("answers");
-        localStorage.removeItem("test_timer");
-    });
-</script>
 <style>
-    /* Улучшенный UX для мобильных */
-    @media (max-width: 576px) {
-        .container {
-            padding: 10px;
+    /* Глобальные стили */
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.9);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+
+    .glass-timer {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-icon {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hover-scale {
+        transition: transform 0.3s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
+
+    /* Кастомные элементы форм */
+    .custom-radio .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.2em;
+    }
+
+    .custom-checkbox .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.2em;
+    }
+
+    /* Адаптация под мобильные */
+    @media (max-width: 768px) {
+        .container-lg {
+            padding: 0 1rem;
         }
 
-        .btn-sm {
-            padding: 8px;
+        .glass-timer {
+            font-size: 1rem;
+            padding: 0.75rem;
+        }
+
+        h1.display-6 {
+            font-size: 1.75rem;
+        }
+
+        .sticky-footer {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .autosize-textarea {
             font-size: 16px;
-        }
-
-        legend {
-            font-size: 18px;
+            min-height: 100px;
         }
 
         .form-check-label {
             font-size: 16px;
         }
+    }
 
-        textarea {
-            font-size: 16px;
+    /* Анимации */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
         }
 
-        /* Таймер */
-        #timer-container {
-            font-size: 18px;
-            padding: 12px;
+        50% {
+            transform: scale(1.05);
         }
 
-        /* Кнопка озвучки */
-        .speak-btn {
-            font-size: 20px;
-            width: 40px;
-            height: 40px;
+        100% {
+            transform: scale(1);
         }
+    }
 
-        /* Пагинация */
-        .pagination .page-link {
-            font-size: 14px;
-            padding: 8px;
-        }
+    .pulse {
+        animation: pulse 1.5s infinite;
     }
 </style>
 
+<script>
+    // Адаптивный текстarea
+    document.querySelectorAll('.autosize-textarea').forEach(el => {
+        el.style.height = el.setAttribute('style', 'height: ' + el.scrollHeight + 'px');
+        el.addEventListener('input', e => {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        });
+    });
+
+    // Обновленный таймер
+    document.addEventListener("DOMContentLoaded", () => {
+        const timerElement = document.getElementById('timer');
+        const initialTime = 5 * 60;
+        let timeLeft = localStorage.getItem('test_timer') || initialTime;
+
+        const updateTimer = () => {
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            timerElement.textContent = `${minutes}:${seconds}`;
+
+            if (timeLeft <= 0) {
+                document.getElementById('test-form').submit();
+            } else {
+                timeLeft--;
+                localStorage.setItem('test_timer', timeLeft);
+                setTimeout(updateTimer, 1000);
+            }
+        };
+
+        updateTimer();
+
+        window.addEventListener('beforeunload', () => {
+            if (timeLeft > 0) localStorage.setItem('test_timer', timeLeft);
+        });
+    });
+
+    // Оптимизированное сохранение ответов
+    const answerManager = {
+        answers: JSON.parse(localStorage.getItem('answers')) || {},
+
+        save(questionId, value) {
+            this.answers[questionId] = value;
+            localStorage.setItem('answers', JSON.stringify(this.answers));
+        },
+
+        load() {
+            Object.entries(this.answers).forEach(([id, value]) => {
+                const question = document.querySelector(`[name="${id}"]`);
+                if (question.type === 'radio') {
+                    document.getElementById(`question_${id}_${value}`).checked = true;
+                } else if (question.type === 'checkbox') {
+                    value.forEach(v => {
+                        document.getElementById(`question_${id}_${v}`).checked = true;
+                    });
+                } else {
+                    question.value = value;
+                }
+            });
+        }
+    };
+
+    // Инициализация при загрузке
+    window.addEventListener('load', () => answerManager.load());
+    document.getElementById('test-form').addEventListener('submit', () => {
+        localStorage.removeItem('answers');
+        localStorage.removeItem('test_timer');
+    });
+</script>
 {% endblock %}

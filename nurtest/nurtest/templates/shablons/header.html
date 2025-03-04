@@ -5,48 +5,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NUR Test</title>
-    <!-- Подключение Bootstrap CSS -->
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Подключение кастомных стилей -->
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        /* Плавная анимация для меню */
-        .navbar-collapse {
-            transition: max-height 0.4s ease-in-out;
+        :root {
+            --primary-gradient: linear-gradient(45deg, #1E90FF, #00CED1);
+            --dark-bg: #1A1F2A;
+            --hover-light: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* Улучшения для мобильной версии */
-        @media (max-width: 991px) {
-            .navbar-nav .nav-item {
-                margin: 8px 0;
-            }
-
-            .navbar-nav .btn {
-                width: 100%;
-                margin-top: 15px;
-            }
-
-            .navbar-collapse {
-                background: rgba(8, 92, 228, 0.225);
-                padding: 20px;
-                margin-top: 10px;
-                border-radius: 5px;
-            }
+        body {
+            background: #F4F7FA;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Анимация иконки бургер-меню */
-        .navbar-toggler-icon {
-            transition: transform 0.3s ease-in-out;
+        .navbar {
+            background: var(--dark-bg);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
         }
 
-        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: #fff;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--hover-light);
+            color: #fff;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+            vertical-align: middle;
+        }
+
+        .btn-outline-danger {
+            border-radius: 2rem;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger:hover {
+            background: linear-gradient(45deg, #FF4D4D, #FF6B6B);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-toggler[aria-expanded="true"] {
             transform: rotate(90deg);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(255, 255, 255, 0.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+
+        /* Адаптивность */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: var(--dark-bg);
+                margin-top: 1rem;
+                padding: 1rem;
+                border-radius: 1rem;
+                box-shadow: var(--shadow-sm);
+                animation: slideIn 0.3s ease-out;
+            }
+
+            .navbar-nav {
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
+            }
+
+            .btn-outline-danger {
+                width: 100%;
+                text-align: center;
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 0.6rem 0.75rem;
+            }
+
+            .btn-outline-danger {
+                padding: 0.6rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Анимация открытия меню */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container-fluid">
                 <!-- Логотип -->
                 <a class="navbar-brand" href="{% url 'home' %}">NUR Test</a>
@@ -61,25 +163,20 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-                                href="{% url 'home' %}">Главная</a>
+                            <a class="nav-link" href="{% url 'home' %}" id="nav-home">Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'test_list' %}active{% endif %}"
-                                href="{% url 'test_list' %}">Тесты</a>
+                            <a class="nav-link" href="{% url 'test_list' %}" id="nav-tests">Тесты</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
-                                href="{% url 'settings' %}">Настройки</a>
+                            <a class="nav-link" href="{% url 'settings' %}" id="nav-settings">Настройки</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'toprank' %}active{% endif %}"
-                                href="{% url 'toprank' %}">Топранг</a>
+                            <a class="nav-link" href="{% url 'toprank' %}" id="nav-toprank">Топранг</a>
                         </li>
                         {% if user.is_authenticated and user.is_staff %}
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'test-list' %}active{% endif %}"
-                                href="{% url 'test-list' %}">Админ-панель</a>
+                            <a class="nav-link" href="{% url 'test-list' %}" id="nav-admin">Админ-панель</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -93,27 +190,36 @@
         </nav>
     </header>
 
-    <!-- Подключение Bootstrap JS -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Кастомный JS для закрытия меню на мобильных устройствах -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const navLinks = document.querySelectorAll("#navbarNav .nav-link");
-            const navbarToggler = document.querySelector(".navbar-toggler");
+            // Логика активного состояния
+            const currentPath = window.location.pathname;
+            const navLinks = {
+                'nav-home': '{% url "home" %}',
+                'nav-tests': '{% url "test_list" %}',
+                'nav-settings': '{% url "settings" %}',
+                'nav-toprank': '{% url "toprank" %}',
+                'nav-admin': '{% url "test-list" %}'
+            };
 
-            navLinks.forEach(function (link) {
-                link.addEventListener("click", function () {
-                    if (window.innerWidth < 992) {
-                        const bsCollapse = new bootstrap.Collapse(document.getElementById("navbarNav"));
-                        bsCollapse.hide();
-                    }
-                });
-            });
-
-            // Изменение состояния кнопки бургера
-            navbarToggler.addEventListener("click", function () {
-                this.setAttribute("aria-expanded", this.classList.contains("collapsed") ? "false" : "true");
-            });
+            for (const [id, url] of Object.entries(navLinks)) {
+                const link = document.getElementById(id);
+                if (link && currentPath === url) {
+                    link.classList.add('active');
+                }
+                if (link) {
+                    link.addEventListener('click', function () {
+                        document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        if (window.innerWidth < 992) {
+                            const bsCollapse = new bootstrap.Collapse(document.getElementById('navbarNav'));
+                            bsCollapse.hide();
+                        }
+                    });
+                }
+            }
         });
     </script>
 </body>

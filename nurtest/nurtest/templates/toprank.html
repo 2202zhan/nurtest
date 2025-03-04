@@ -1,80 +1,286 @@
 {% extends 'shablons/main.html' %}
 
 {% block content %}
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <h1 class="display-6 fw-light mb-0">Топ рейтинг пользователей</h1>
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-5 flex-column flex-md-row">
+        <div class="text-center text-md-start">
+            <h1 class="display-6 fw-light mb-2">Топ рейтинг пользователей</h1>
+            <p class="text-muted lead mb-0">Лучшие участники по результатам тестов</p>
+        </div>
     </div>
 
-    <div class="row g-4">
+    <div class="leaderboard">
+        <div class="leaderboard-header glass-effect mb-3 p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-medium text-muted">Место</span>
+                <span class="fw-medium text-muted">Пользователь</span>
+                <span class="fw-medium text-muted">Баллы</span>
+            </div>
+        </div>
+
         {% for user in ratings %}
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card shadow-sm hover-elevate">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <!-- Место в рейтинге -->
-                        <div class="position-badge bg-gradient-primary text-white me-3">
-                            {{ user.position }}
-                        </div>
+        <div class="leaderboard-item {% if forloop.first %}top-leader{% endif %}" data-aos="fade-up"
+            data-aos-delay="{{ forloop.counter0|add:'0' }}">
+            <div class="d-flex align-items-center justify-content-between px-3 py-3">
+                <!-- Место -->
+                <span
+                    class="rank-circle {% if forloop.first %}gold{% elif forloop.counter == 2 %}silver{% elif forloop.counter == 3 %}bronze{% else %}default{% endif %}">
+                    {{ user.position }}
+                </span>
 
-                        <!-- Информация -->
-                        <div class="flex-grow-1">
-                            <h5 class="mb-0">{{ user.username }}</h5>
-                            <div class="text-muted small">Общий балл</div>
-                        </div>
-
-                        <!-- Баллы -->
-                        <div class="score-display bg-gradient-success text-white">
-                            {{ user.score }}
-                        </div>
-                    </div>
+                <!-- Имя -->
+                <div class="user-info flex-grow-1 mx-3 text-truncate">
+                    <span class="fw-medium">{{ user.username }}</span>
+                    <small class="text-muted d-block">
+                        {% if forloop.first %}
+                        Лидер рейтинга
+                        {% else %}
+                        Участник
+                        {% endif %}
+                    </small>
                 </div>
+
+                <!-- Баллы -->
+                <span class="score-pill bg-gradient-success text-white">
+                    {{ user.score }}
+                </span>
             </div>
         </div>
         {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="bi bi-emoji-frown me-2"></i>
-                Пока никто не прошел тесты
-            </div>
+        <div class="empty-state text-center py-5 glass-effect">
+            <i class="bi bi-emoji-neutral me-2"></i>
+            Пока никто не попал в рейтинг
+            <p class="text-muted mt-2">Пройдите тесты, чтобы занять своё место среди лучших!</p>
+            <a href="{% url 'test_list' %}" class="btn btn-outline-primary btn-sm mt-3">Начать тест</a>
         </div>
         {% endfor %}
+
+        {% if ratings %}
+        <div class="leaderboard-footer text-center mt-4">
+            <p class="text-muted small">Рейтинг обновляется ежедневно на основе ваших результатов.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
 <style>
-    .hover-elevate {
-        transition: transform 0.3s ease;
+    :root {
+        --gold: #FFD700;
+        --silver: #C0C0C0;
+        --bronze: #CD7F32;
+        --primary-gradient: linear-gradient(45deg, #6C5CE7, #4A90E2);
+        --success-gradient: linear-gradient(45deg, #00B894, #55EFC4);
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .hover-elevate:hover {
-        transform: translateY(-5px);
+    .leaderboard {
+        max-width: 800px;
+        margin: 0 auto;
     }
 
-    .position-badge {
-        width: 40px;
-        height: 40px;
+    .leaderboard-header {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 0.75rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .leaderboard-item {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 0.75rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .leaderboard-item:hover {
+        transform: scale(1.02);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .top-leader {
+        background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.95));
+        border: 1px solid var(--gold);
+    }
+
+    .rank-circle {
+        width: 36px;
+        height: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 12px;
+        border-radius: 50%;
         font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
     }
 
-    .score-display {
-        padding: 8px 16px;
-        border-radius: 20px;
+    .gold {
+        background: var(--gold);
+        color: #fff;
+    }
+
+    .silver {
+        background: var(--silver);
+        color: #fff;
+    }
+
+    .bronze {
+        background: var(--bronze);
+        color: #fff;
+    }
+
+    .default {
+        background: #E9ECEF;
+        color: #333;
+    }
+
+    .user-info {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .score-pill {
+        padding: 0.4rem 1rem;
+        border-radius: 1rem;
         font-weight: 600;
-        min-width: 80px;
+        font-size: 0.95rem;
+        min-width: 60px;
         text-align: center;
-    }
-
-    .bg-gradient-primary {
-        background: linear-gradient(45deg, #6C5CE7, #4A90E2);
+        flex-shrink: 0;
     }
 
     .bg-gradient-success {
-        background: linear-gradient(45deg, #00B894, #55EFC4);
+        background: var(--success-gradient);
+    }
+
+    .empty-state {
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 1rem;
+        backdrop-filter: blur(10px);
+        font-size: 1.1rem;
+        color: #666;
+    }
+
+    .leaderboard-footer {
+        font-size: 0.9rem;
+    }
+
+    .btn-outline-primary {
+        border-radius: 2rem;
+        padding: 0.4rem 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-gradient);
+        color: #fff;
+        border-color: transparent;
+    }
+
+    /* Анимация появления */
+    [data-aos="fade-up"] {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    [data-aos="fade-up"].aos-animate {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 1rem;
+        }
+
+        .display-6 {
+            font-size: 1.5rem;
+        }
+
+        .lead {
+            font-size: 1rem;
+        }
+
+        .leaderboard-item {
+            padding: 0.5rem;
+        }
+
+        .rank-circle {
+            width: 32px;
+            height: 32px;
+            font-size: 0.9rem;
+        }
+
+        .score-pill {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.85rem;
+            min-width: 50px;
+        }
+
+        .user-info {
+            max-width: 150px;
+        }
+
+        .leaderboard-header {
+            padding: 0.75rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .display-6 {
+            font-size: 1.25rem;
+        }
+
+        .lead {
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-item {
+            padding: 0.4rem;
+        }
+
+        .rank-circle {
+            width: 28px;
+            height: 28px;
+            font-size: 0.85rem;
+        }
+
+        .score-pill {
+            padding: 0.25rem 0.7rem;
+            font-size: 0.8rem;
+            min-width: 45px;
+        }
+
+        .user-info {
+            max-width: 100px;
+        }
+
+        .empty-state {
+            font-size: 0.95rem;
+            padding: 1.5rem;
+        }
+
+        .leaderboard-header {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const items = document.querySelectorAll('[data-aos="fade-up"]');
+        items.forEach(item => {
+            const delay = parseInt(item.getAttribute('data-aos-delay')) * 100;
+            setTimeout(() => {
+                item.classList.add('aos-animate');
+            }, delay);
+        });
+    });
+</script>
 {% endblock %}

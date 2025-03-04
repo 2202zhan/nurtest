@@ -1,129 +1,224 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 {% if request.user.is_superuser %}
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <h1 class="display-6 fw-light mb-0">Управление пользователями</h1>
+<div class="container-fluid px-2 px-lg-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-md-center mb-4 gap-3">
+        <h1 class="display-6 fw-light mb-0">👤 Управление пользователями</h1>
+        <div class="d-flex gap-2">
+            <button class="btn btn-dark rounded-4 px-4 hover-scale" data-bs-toggle="modal" data-bs-target="#helpModal">
+                <i class="bi bi-info-circle me-2"></i>Помощь
+            </button>
+        </div>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead class="bg-light">
+    <!-- Desktop Table -->
+    <div class="card glass-effect border-0 shadow-sm d-none d-lg-block">
+        <div class="card-body p-3 p-lg-4">
+            <div class="table-responsive-lg">
+                <table class="table align-middle hover-stack">
+                    <thead class="bg-gradient-dark text-light">
                         <tr>
-                            <th>Имя пользователя</th>
-                            <th>Статус</th>
-                            <th>Причина блокировки</th>
-                            <th>Действия</th>
-                            <!-- <th>Роли</th> -->
+                            <th class="ps-4 fw-medium">Пользователь</th>
+                            <th class="fw-medium">Статус</th>
+                            <th class="fw-medium">Причина блокировки</th>
+                            <th class="pe-4 fw-medium">Действия</th>
                         </tr>
                     </thead>
                     <tbody>
-                    
-                    {% for user in users %}
-                        <tr class="{% if user.is_blocked %}table-danger{% endif %}">
-                            <td>{{ user.username }}</td>
-                            <td>
-                                {% if user.is_blocked %}
-                                <span class="badge bg-danger">Заблокирован</span>
-                                {% else %}
-                                <span class="badge bg-success">Активен</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ user.block_reason|default:"-" }}</td>
-                            <td>
-                                {% if user.is_blocked %}
-                                <a href="{% url 'unblock_user' user.id %}" class="btn btn-sm btn-success">
-                                    Разблокировать
-                                </a>
-                                {% else %}
-                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                    data-bs-target="#blockModal{{ user.id }}">
-                                    Заблокировать
-                                </button>
-                                {% endif %}
-                            </td>
-                            <!-- <td>
-                                <form method="POST" action="{% url 'update_user_roles' user.id %}">
-                                    {% csrf_token %}
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="can_add_tests"
-                                            id="addTests{{ user.id }}" {% if user.can_add_tests %}checked{% endif %}>
-                                        <label class="form-check-label" for="addTests{{ user.id }}">Добавление
-                                            тестов</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="can_edit_tests"
-                                            id="editTests{{ user.id }}" {% if user.can_edit_tests %}checked{% endif %}>
-                                        <label class="form-check-label" for="editTests{{ user.id }}">Редактирование
-                                            тестов</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="can_delete_tests"
-                                            id="deleteTests{{ user.id }}" {% if user.can_delete_tests %}checked{% endif %}>
-                                        <label class="form-check-label" for="deleteTests{{ user.id }}">Удаление
-                                            тестов</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="can_add_questions"
-                                            id="addQuestions{{ user.id }}" {% if user.can_add_questions %}checked{% endif %}>
-                                        <label class="form-check-label" for="addQuestions{{ user.id }}">Добавление
-                                            вопросов</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="can_edit_questions"
-                                            id="editQuestions{{ user.id }}" {% if user.can_edit_questions %}checked{% endif %}>
-                                        <label class="form-check-label" for="editQuestions{{ user.id }}">Редактирование
-                                            вопросов</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="can_delete_questions"
-                                            id="deleteQuestions{{ user.id }}" {% if user.can_delete_questions %}checked{% endif %}>
-                                        <label class="form-check-label" for="deleteQuestions{{ user.id }}">Удаление
-                                            вопросов</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-sm btn-primary mt-2">Обновить</button>
-                                </form>
-                            </td>
-                        </tr> -->
+                        {% for user in users %}
+                        <tr class="{% if user.is_blocked %}table-danger-blur{% endif %} hover-elevate">
+                            <td class="ps-4">
 
-                        <!-- Модальное окно блокировки (перенесено внутрь tbody) -->
-                        <div class="modal fade" id="blockModal{{ user.id }}" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Блокировка пользователя</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <form method="POST" action="{% url 'block_user' user.id %}">
-                                        {% csrf_token %}
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label class="form-label">Причина блокировки</label>
-                                                <textarea name="reason" class="form-control" rows="3"
-                                                    required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Отмена</button>
-                                            <button type="submit" class="btn btn-danger">Подтвердить блокировку</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+                                <div class="fw-medium">{{ user.username }}</div>
+                                <small class="text-muted">{{ user.email|default:"-" }}</small>
+            </div>
+        </div>
+        </td>
+        <td>
+            {% if user.is_blocked %}
+            <span class="badge bg-gradient-danger">Заблокирован</span>
+            {% else %}
+            <span class="badge bg-gradient-success">Активен</span>
+            {% endif %}
+        </td>
+        <td>{{ user.block_reason|default:"-" }}</td>
+        <td class="pe-4">
+            {% if user.is_blocked %}
+            <a href="{% url 'unblock_user' user.id %}" class="btn btn-sm btn-success rounded-pill px-3 hover-scale">
+                <i class="bi bi-unlock me-2"></i>Разблокировать
+            </a>
+            {% else %}
+            <button class="btn btn-sm btn-danger rounded-pill px-3 hover-scale" data-bs-toggle="modal"
+                data-bs-target="#blockModal{{ user.id }}">
+                <i class="bi bi-lock me-2"></i>Заблокировать
+            </button>
+            {% endif %}
+        </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center text-muted py-4">
+                <i class="bi bi-people me-2"></i>Пользователи не найдены
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<!-- Mobile Cards -->
+<div class="row row-cols-1 g-3 d-lg-none">
+    {% for user in users %}
+    <div class="col">
+        <div class="card glass-effect border-0 hover-scale">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="{% static 'icons/user-avatar.svg' %}" class="rounded-circle" width="40" height="40"
+                            alt="Avatar">
+                        <div>
+                            <div class="fw-medium">{{ user.username }}</div>
+                            <small class="text-muted">{{ user.email|default:"-" }}</small>
                         </div>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                    {% if user.is_blocked %}
+                    <span class="badge bg-gradient-danger">Заблокирован</span>
+                    {% else %}
+                    <span class="badge bg-gradient-success">Активен</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Причина блокировки:</small>
+                    <div class="fw-medium">{{ user.block_reason|default:"-" }}</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    {% if user.is_blocked %}
+                    <a href="{% url 'unblock_user' user.id %}"
+                        class="btn btn-success flex-grow-1 rounded-pill hover-scale">
+                        <i class="bi bi-unlock me-2"></i>Разблокировать
+                    </a>
+                    {% else %}
+                    <button class="btn btn-danger flex-grow-1 rounded-pill hover-scale" data-bs-toggle="modal"
+                        data-bs-target="#blockModal{{ user.id }}">
+                        <i class="bi bi-lock me-2"></i>Заблокировать
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col">
+        <div class="card glass-effect text-center p-4">
+            <i class="bi bi-people fs-2 text-muted"></i>
+            <div class="mt-2 text-muted">Пользователи не найдены</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modals -->
+{% for user in users %}
+<div class="modal fade" id="blockModal{{ user.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-effect">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">🔒 Блокировка пользователя</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'block_user' user.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Пользователь: <strong>{{ user.username }}</strong></label>
+                        <textarea name="reason" class="form-control rounded-3" rows="3"
+                            placeholder="Укажите причину блокировки..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        <i class="bi bi-lock me-2"></i>Заблокировать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-effect">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">❓ Помощь по управлению</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-lock me-2"></i>Блокировка - ограничивает доступ к системе
+                    </li>
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-unlock me-2"></i>Разблокировка - восстанавливает доступ
+                    </li>
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-info-circle me-2"></i>Все действия логируются
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
+</div>
 {% else %}
-<h3 class="text-danger">Доступ запрещен</h3>
+<div class="container text-center py-5">
+    <i class="bi bi-shield-lock fs-1 text-danger"></i>
+    <h2 class="mt-3 fw-light">Доступ запрещен</h2>
+    <p class="text-muted mt-2">Требуются права администратора</p>
+</div>
 {% endif %}
-{% endblock %}
 
+<style>
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+
+    .bg-gradient-danger {
+        background: linear-gradient(45deg, #ff4757, #ff6b6b);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(45deg, #2ed573, #3ae374);
+    }
+
+    .hover-scale {
+        transition: transform 0.3s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+
+    .table-danger-blur {
+        background: rgba(255, 77, 79, 0.08);
+    }
+
+    .modal-content.glass-effect {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
